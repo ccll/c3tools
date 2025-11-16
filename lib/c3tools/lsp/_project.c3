@@ -18,7 +18,7 @@ struct LspProject
     allocator::DynamicArenaAllocator _allocator;
 }
 
-fn LspProject LspProject.new_init(String proj_path, String stdlib_path) @operator(construct)
+fn LspProject new_lsp_project(String proj_path, String stdlib_path)
 {
     LspProject self = {
         .proj_path = proj_path,
@@ -26,20 +26,20 @@ fn LspProject LspProject.new_init(String proj_path, String stdlib_path) @operato
     };
 
     //  Arena allocator for storing all AST metadata (DynamicArenaAllocator backed by heap)
-    self._allocator.init(5 * 1024 * 1024, allocator::heap());
+    self._allocator.init(mem, 5 * 1024 * 1024);
 
     // All other allocations are done on heap to isolate AST data and make it sequential
-    self.modules = SymbolCache.new_init(capacity: 512);
+    self.modules = symbols::new_symbol_cache(capacity: 512);
 
     // We will store symbols for core/std/project separately because they might have different
     // access or update patterns within LSP lifetime
 
     // builtin + std::core
-    self.sym_core = SymbolCache.new_init(capacity: 128);
+    self.sym_core = symbols::new_symbol_cache(capacity: 128);
     // all other stdlib symbols
-    self.sym_std = SymbolCache.new_init(capacity: 1024);
+    self.sym_std = symbols::new_symbol_cache(capacity: 1024);
     // project symbols
-    self.sym_proj = SymbolCache.new_init(capacity: 1024);
+    self.sym_proj = symbols::new_symbol_cache(capacity: 1024);
 
     return self;
 }
@@ -54,7 +54,7 @@ fn void LspProject.free(&self)
     self._allocator.free();
 }
 
-fn void! LspProject.module_add(&self, AstModule* m) @private
+fn void? LspProject.module_add(&self, AstModule* m) @private
 {
     assert(m.hash != 0, "module hash is zero");
     SymbolItem* it = self.modules.add(m.value);
@@ -63,7 +63,7 @@ fn void! LspProject.module_add(&self, AstModule* m) @private
     it.ptr.mod = m;
 }
 
-fn void! LspProject.load_symbols(&self)
+fn void? LspProject.load_symbols(&self)
 {
     assert(self.modules.len() > 0, "load modules first");
     SymbolItem* items = self.modules.items();
@@ -88,7 +88,7 @@ fn void! LspProject.load_symbols(&self)
     // );
 }
 
-fn void! LspProject._load_module_symbols(&self, SymbolCache** dest, AstModule* src) @private
+fn void? LspProject._load_module_symbols(&self, SymbolCache** dest, AstModule* src) @private
 {
     assert(src.hash, "no module hash");
     // io::eprintfn("adding module symbols: %s", src.value);
@@ -109,7 +109,7 @@ fn void! LspProject._load_module_symbols(&self, SymbolCache** dest, AstModule* s
     }
 }
 
-fn void! LspProject._add_symbol(&self, SymbolCache* dest, AstModule* src, AstTypeDef* decl) @private
+fn void? LspProject._add_symbol(&self, SymbolCache* dest, AstModule* src, AstTypeDef* decl) @private
 {
     bool is_private = false;
     bool is_conditional = false;
@@ -126,7 +126,7 @@ fn void! LspProject._add_symbol(&self, SymbolCache* dest, AstModule* src, AstTyp
     // declarations.push(ModuleDecl {.mod = m, .decl = decl});
 }
 
-fn void! LspProject.load_source(&self, String full_source, String file_path)
+fn void? LspProject.load_source(&self, String full_source, String file_path)
 {
 
     Ast ast = ast::parse(full_source, file_path, allc: &self._allocator);
@@ -137,27 +137,27 @@ fn void! LspProject.load_source(&self, String full_source, String file_path)
     }
 }
 
-fn void! LspProject.load_path(&self, String path) @local
+fn void? LspProject.load_path(&self, String path) @local
 {
     assert(path);
 
-    path::Path p = path::temp_new(path)!;
+    path::Path p = path::temp(path)!;
     if (!path::exists(p)) {
-        return IoError.FILE_NOT_FOUND?;
+        return io::FILE_NOT_FOUND?;
     }
     if (!path::is_dir(p)) {
-        return IoError.FILE_NOT_DIR?;
+        return io::FILE_NOT_DIR?;
     }
 
-    path::PathWalker fnwalk = fn bool! (Path p, bool is_dir, void* ctx) {
+    path::PathWalker fnwalk = fn bool? (Path p, bool is_dir, void* ctx) {
         LspProject* self = (LspProject*)ctx;
         if (is_dir) return false;
         if (!p.has_extension("c3")) {
             return false;
         }
 
-        String contents = (String)file::load_new(p.str_view())!;
-        defer contents.free();
+        String contents = (String)file::load(mem, p.str_view())!;
+        defer contents.free(mem);
 
         self.load_source(contents, p.str_view())!;
 
@@ -166,7 +166,7 @@ fn void! LspProject.load_path(&self, String path) @local
     p.walk(fnwalk, self)!!;
 }
 
-fn void! LspProject.load(&self)
+fn void? LspProject.load(&self)
 {
     assert(self.modules.len() == 0, "double load?");
 

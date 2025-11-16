@@ -56,7 +56,7 @@ struct SymbolItem @align(32)
 
 $assert(SymbolItem.sizeof == 32);
 
-fn SymbolCache* SymbolCache.new_init(uint capacity) @operator(construct)
+fn SymbolCache* new_symbol_cache(uint capacity)
 {
     // NOTE: adding extra +1 to capacity for sentinel record
     usz data_size = calc_data_size(capacity + 1);
@@ -89,12 +89,12 @@ macro uint SymbolCache.len(&self) => self.items_len;
  Finds first SymbolItem* in SymbolCache with the same hash as name_or_hash,
  this method is expected to be used in a loop with SymbolCache.next() for checking all collisions.
 
- @param name_or_hash "Fnv32a hash or String name"
+ @param name_or_hash: "Fnv32a hash or String name"
 *>
 macro SymbolItem* SymbolCache.first(&self, name_or_hash)
 {
     Fnv32a hash;
-    $switch ($typeof(name_or_hash))
+    $switch $typeof(name_or_hash):
         $case String:
             hash.init();
             hash.update(name_or_hash);
@@ -114,7 +114,7 @@ macro SymbolItem* SymbolCache.first(&self, name_or_hash)
 <*
  Returns next item with hash collision (if any)
 
- @param [in] item "Item returned by previous SymbolCache.find()"
+ @param [in] item: "Item returned by previous SymbolCache.find()"
  @return "next item or null if not exist"
  @require item != null
 *>
@@ -216,7 +216,7 @@ fn SymbolCache* SymbolCache.grow(&self, uint new_capacity)
 
     // Force clean memory region which was previously allocated by names, and now it's for items
     for (usz i = old_items_capacity; i < self.items_capacity; i++) {
-        items[i] = SymbolItem {};
+        items[i] = {};
     }
 
     // Restoring sentinel data for after growing
@@ -241,8 +241,8 @@ struct SymbolItemIterator
     uint next_idx;
 }
 
-macro SymbolNameIterator SymbolCache.iter_names(&self) => SymbolNameIterator { .cache = self };
-macro SymbolItemIterator SymbolCache.iter_items(&self) => SymbolItemIterator { .cache = self };
+macro SymbolNameIterator SymbolCache.iter_names(&self) => { .cache = self };
+macro SymbolItemIterator SymbolCache.iter_items(&self) => { .cache = self };
 
 macro usz SymbolNameIterator.len(self) @operator(len) => self.cache.names_cnt;
 macro usz SymbolItemIterator.len(self) @operator(len) => self.cache.items_len;
@@ -346,7 +346,7 @@ macro SymbolItem* SymbolCache._insert_item(&self, Fnv32a hash, uint insert_at) @
     for (int i = self.items_len - 1; i > insert_at; i--) {
         items[i] = items[i - 1];
     }
-    items[insert_at] = SymbolItem { .hash = hash };
+    items[insert_at] = { .hash = hash };
     return &items[insert_at];
 }
 

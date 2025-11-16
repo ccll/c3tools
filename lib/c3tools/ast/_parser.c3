@@ -5,7 +5,7 @@ import c3tools::ast::lexer @public;
 <*
  Returns TokenType of current scope 
 
- @param offset "1 - last, 2 - last-2, etc.."
+ @param offset: "1 - last, 2 - last-2, etc.."
  @return "current scope, or INVALID_TOKEN if offset if too high or no scope at all"
  @require offset > 0
 *>
@@ -330,7 +330,7 @@ fn bool Ast.parse_function(&ast, AstNode* node, Token* t, NodeParserState* state
                     ast.@allc_add(AstNode, &node_func.name, t);
                 case LPAREN:
                     if (state.scope_depth == 1) {
-                        DString fname = dstring::temp_new();
+                        DString fname = dstring::temp();
                         node_func.value = ast.@allc_str(ast.@node_join(node_func.name, fname, "."));
                         nextcase STATE: state.transition(VAR);
                     }
@@ -532,7 +532,7 @@ fn bool Ast.parse_interface(&ast, AstNode* node, Token* t, NodeParserState* stat
                 case DOCS_START:
                     if (state.scope_depth == 2 && !state.sub_node) {
                         ast.@allc_add(AstDoc, &state.sub_node, &ast.lexer.token);
-                        ast.state_stack.push(NodeParserState {});
+                        ast.state_stack.push({});
                         assert(state.sub_node.type == TokenType.DOCS_START);
                         ast.parse_docstring(state.sub_node, &ast.lexer.token, &ast.state_stack[1]);
                         assert(ast.state_stack.len() == 2);
@@ -549,7 +549,7 @@ fn bool Ast.parse_interface(&ast, AstNode* node, Token* t, NodeParserState* stat
                         f.docs = (AstDoc*)state.sub_node;
 
                         if (ast.state_stack.len() > 1) ast.state_stack.remove_last()!!;
-                        ast.state_stack.push(NodeParserState {});
+                        ast.state_stack.push({});
 
                         state.sub_node = f;
                         assert(state.sub_node.type == TokenType.FN);
@@ -720,7 +720,7 @@ fn bool Ast.parse_structural(&ast, AstNode* node, Token* t, NodeParserState* sta
                             &ast.lexer.token
                         );
                         s.docs = (AstDoc*)state.sub_node;
-                        ast.state_stack.push(NodeParserState {});
+                        ast.state_stack.push({});
                         state.sub_node = s;
                     }
                     nextcase default;  // initialize processing substructure

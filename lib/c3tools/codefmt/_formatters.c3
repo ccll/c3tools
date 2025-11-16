@@ -10,7 +10,7 @@ import std::collections::list;
 <*
  Returns appropriate formatter function/state for global level statements
 *>
-fn CodeFmtFn! CodeFmt.global_formatter_dispatch(CodeFmt* self, Token* t) @private
+fn CodeFmtFn? CodeFmt.global_formatter_dispatch(CodeFmt* self, Token* t) @private
 {
     switch (t.type) {
         case FN:
@@ -46,7 +46,7 @@ fn CodeFmtFn! CodeFmt.global_formatter_dispatch(CodeFmt* self, Token* t) @privat
 <*
  Returns special formatter function for in-scope token.
 *>
-fn CodeFmtFn! CodeFmt.local_formatter_dispatch(CodeFmt* self, Token* t) @private
+fn CodeFmtFn? CodeFmt.local_formatter_dispatch(CodeFmt* self, Token* t) @private
 {
     switch (t.type) {
         case IF:
@@ -71,7 +71,7 @@ fn CodeFmtFn! CodeFmt.local_formatter_dispatch(CodeFmt* self, Token* t) @private
 }
 
 <* Generic comment processor if there is not cache_statement pending + fmt: off handler *>
-fn bool! CodeFmt.format_comment_or_empty(&self, NodeParserState* state, Token* t)
+fn bool? CodeFmt.format_comment_or_empty(&self, NodeParserState* state, Token* t)
 {
     if (t.type == COMMENT_SINGLE) {
         if (t.value.starts_with("// fmt: off") && !self._is_paused) {
@@ -177,7 +177,7 @@ fn bool! CodeFmt.format_comment_or_empty(&self, NodeParserState* state, Token* t
 <*
  Formatter for generic file contents
 *>
-fn bool! CodeFmt.format_global_file_scope(CodeFmt* self, Token* t, NodeParserState* state) @private
+fn bool? CodeFmt.format_global_file_scope(CodeFmt* self, Token* t, NodeParserState* state) @private
 {
     // initialization with null token
     if (state.current_state == INVALID_TOKEN) {
@@ -226,7 +226,7 @@ fn bool! CodeFmt.format_global_file_scope(CodeFmt* self, Token* t, NodeParserSta
 
  Format steps: format_fn_args -> format_code_scope -> foreach(format_generic_statement: statements)
 *>
-fn bool! CodeFmt.format_fn(CodeFmt* self, Token* t, NodeParserState* state) @private
+fn bool? CodeFmt.format_fn(CodeFmt* self, Token* t, NodeParserState* state) @private
 {
     assert(t.type != EMPTY_LINE);
 
@@ -350,7 +350,7 @@ fn bool! CodeFmt.format_fn(CodeFmt* self, Token* t, NodeParserState* state) @pri
 <*
  Formatting fn/macro arguments 
 *>
-fn bool! CodeFmt.format_fn_args(CodeFmt* self, Token* t, NodeParserState* state) @private
+fn bool? CodeFmt.format_fn_args(CodeFmt* self, Token* t, NodeParserState* state) @private
 {
     assert(t.type != EMPTY_LINE);
 
@@ -394,7 +394,7 @@ fn bool! CodeFmt.format_fn_args(CodeFmt* self, Token* t, NodeParserState* state)
 <*
  Formatting generic code scope ({ ... } inside a function)
 *>
-fn bool! CodeFmt.format_code_scope(CodeFmt* self, Token* t, NodeParserState* state) @private
+fn bool? CodeFmt.format_code_scope(CodeFmt* self, Token* t, NodeParserState* state) @private
 {
     assert(t.type != EMPTY_LINE);
 
@@ -498,7 +498,7 @@ fn bool! CodeFmt.format_code_scope(CodeFmt* self, Token* t, NodeParserState* sta
 <*
  Formatting individual (generic statements) ending with ;
 *>
-fn bool! CodeFmt.format_generic_statement(CodeFmt* self, Token* t, NodeParserState* state) @private
+fn bool? CodeFmt.format_generic_statement(CodeFmt* self, Token* t, NodeParserState* state) @private
 {
     assert(t.type != EMPTY_LINE);
 
@@ -684,7 +684,7 @@ fn bool! CodeFmt.format_generic_statement(CodeFmt* self, Token* t, NodeParserSta
 <*
  Formatting for extern ...
 *>
-fn bool! CodeFmt.format_generic_extern(CodeFmt* self, Token* t, NodeParserState* state) @private
+fn bool? CodeFmt.format_generic_extern(CodeFmt* self, Token* t, NodeParserState* state) @private
 {
     assert(t.type != EMPTY_LINE);
 
@@ -715,7 +715,7 @@ fn bool! CodeFmt.format_generic_extern(CodeFmt* self, Token* t, NodeParserState*
 <*
  Formatting of generic code flow statement block (for, while, if, foreach, switch, defer)
 *>
-fn bool! CodeFmt.format_statement_code_flow(CodeFmt* self, Token* t, NodeParserState* state) @private
+fn bool? CodeFmt.format_statement_code_flow(CodeFmt* self, Token* t, NodeParserState* state) @private
 {
     assert(state.initial_token != INVALID_TOKEN);
     assert(t.type != EMPTY_LINE);
@@ -916,7 +916,7 @@ fn bool CodeFmt.format_docstring_text_write(&self, Token* t)
 <*
  Formatting generic doc string with contracts
 *>
-fn bool! CodeFmt.format_docstring(CodeFmt* self, Token* t, NodeParserState* state) @private
+fn bool? CodeFmt.format_docstring(CodeFmt* self, Token* t, NodeParserState* state) @private
 {
     assert(t.type != EMPTY_LINE);
 
@@ -1035,7 +1035,7 @@ fn bool! CodeFmt.format_docstring(CodeFmt* self, Token* t, NodeParserState* stat
 <*
  Formatting $switch: $case / $default scopes
 *>
-fn bool! CodeFmt.format_comptime_switch_body(CodeFmt* self, Token* t, NodeParserState* state) @private
+fn bool? CodeFmt.format_comptime_switch_body(CodeFmt* self, Token* t, NodeParserState* state) @private
 {
     assert(t.type != EMPTY_LINE);
     assert(state.initial_token != INVALID_TOKEN);
@@ -1123,7 +1123,7 @@ fn bool! CodeFmt.format_comptime_switch_body(CodeFmt* self, Token* t, NodeParser
 <*
  Formatting of compile time code flow statement block ($for, $if, $foreach, $switch)
 *>
-fn bool! CodeFmt.format_comptime_code_flow(CodeFmt* self, Token* t, NodeParserState* state) @private
+fn bool? CodeFmt.format_comptime_code_flow(CodeFmt* self, Token* t, NodeParserState* state) @private
 {
     assert(t.type != EMPTY_LINE);
     assert(state.initial_token != INVALID_TOKEN);
@@ -1241,7 +1241,7 @@ fn bool! CodeFmt.format_comptime_code_flow(CodeFmt* self, Token* t, NodeParserSt
 }
 
 <* Asm block with automatically disabled formatting *>
-fn bool! CodeFmt.asm_non_fmt_block(CodeFmt* self, Token* t, NodeParserState* state) @private
+fn bool? CodeFmt.asm_non_fmt_block(CodeFmt* self, Token* t, NodeParserState* state) @private
 {
     assert(t.type != EMPTY_LINE);
 
@@ -1281,7 +1281,7 @@ fn bool! CodeFmt.asm_non_fmt_block(CodeFmt* self, Token* t, NodeParserState* sta
 <*
  Formatting asm() and asm { block }
 *>
-fn bool! CodeFmt.format_asm(CodeFmt* self, Token* t, NodeParserState* state) @private
+fn bool? CodeFmt.format_asm(CodeFmt* self, Token* t, NodeParserState* state) @private
 {
     assert(t.type != EMPTY_LINE);
 
@@ -1327,7 +1327,7 @@ fn bool! CodeFmt.format_asm(CodeFmt* self, Token* t, NodeParserState* state) @pr
 <*
  Formatter for struct / union / bitstruct contents
 *>
-fn bool! CodeFmt.format_structural(CodeFmt* self, Token* t, NodeParserState* state) @private
+fn bool? CodeFmt.format_structural(CodeFmt* self, Token* t, NodeParserState* state) @private
 {
     assert(t.type != EMPTY_LINE);
 
@@ -1376,7 +1376,7 @@ fn bool! CodeFmt.format_structural(CodeFmt* self, Token* t, NodeParserState* sta
 <*
  Formatter for struct / union / bitstruct contents
 *>
-fn bool! CodeFmt.format_structural_scope(CodeFmt* self, Token* t, NodeParserState* state) @private
+fn bool? CodeFmt.format_structural_scope(CodeFmt* self, Token* t, NodeParserState* state) @private
 {
     assert(t.type != EMPTY_LINE);
 
@@ -1429,7 +1429,7 @@ fn bool! CodeFmt.format_structural_scope(CodeFmt* self, Token* t, NodeParserStat
 <*
  Formatter for enums, faults
 *>
-fn bool! CodeFmt.format_enumerable(CodeFmt* self, Token* t, NodeParserState* state) @private
+fn bool? CodeFmt.format_enumerable(CodeFmt* self, Token* t, NodeParserState* state) @private
 {
     assert(t.type != EMPTY_LINE);
 
@@ -1522,7 +1522,7 @@ fn bool! CodeFmt.format_enumerable(CodeFmt* self, Token* t, NodeParserState* sta
 <*
  Formatter for interfaces
 *>
-fn bool! CodeFmt.format_interface(CodeFmt* self, Token* t, NodeParserState* state) @private
+fn bool? CodeFmt.format_interface(CodeFmt* self, Token* t, NodeParserState* state) @private
 {
     assert(t.type != EMPTY_LINE);
 

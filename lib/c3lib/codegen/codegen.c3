@@ -40,9 +40,9 @@ struct CodeGen
 <*
  CodeGen constructor 
 *>
-fn CodeGen* CodeGen.new_init(&self)
+fn CodeGen* CodeGen.init(&self)
 {
-    self.buf.new_init();
+    self.buf.init(mem);
     return self;
 }
 

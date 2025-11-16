@@ -11,7 +11,7 @@ import std::collections::list;
 <*
  Dumps and formats collected cache_statement_ array into code
 *>
-macro void! CodeFmt.cache_statement_dump(
+macro void? CodeFmt.cache_statement_dump(
     &self, TokenType wrap_rule = INVALID_TOKEN, bool no_split = false
 ) @private
 {
@@ -131,9 +131,9 @@ macro void! CodeFmt.cache_statement_dump(
 <*
  Struct initializers dump MyStruct s = {.foo = 1, .sub = {.bar = 0}}
 *>
-macro void! CodeFmt.cache_statement_dump_struct_init(&self, bool is_multiline, TokenType wrap_rule) @private
+macro void? CodeFmt.cache_statement_dump_struct_init(&self, bool is_multiline, TokenType wrap_rule) @private
 {
-    NodeParserState tmpstate = NodeParserState {};
+    NodeParserState tmpstate = {};
     TokenType brake_type = INVALID_TOKEN;
     self.@cache_statement_iter(; usz i, Token* t) {
         // if (self._print_lex) io::eprintf("%s ", t.type);
@@ -203,9 +203,9 @@ macro void! CodeFmt.cache_statement_dump_struct_init(&self, bool is_multiline, T
 <*
  Generic statement dumper
 *>
-macro void! CodeFmt.cache_statement_dump_generic(&self, bool is_multiline, TokenType wrap_rule) @private
+macro void? CodeFmt.cache_statement_dump_generic(&self, bool is_multiline, TokenType wrap_rule) @private
 {
-    NodeParserState tmpstate = NodeParserState {};
+    NodeParserState tmpstate = {};
     TokenType brake_type = INVALID_TOKEN;
 
     // This filter is used for forcing raw writing (e.g. cast vs call ambiguity)

@@ -735,7 +735,7 @@ fn bool CodeFmt._resolve__prev_is_binexp(&self) @private
 *>
 fn usz CodeFmt._resolve__next_is_cast_and_dump(&self, usz current_idx) @private
 {
-    NodeParserState tmpstate = NodeParserState {};
+    NodeParserState tmpstate = {};
 
     bool is_cast = true;
     bool has_type = false;
