@@ -11,7 +11,7 @@ fn int main(String[] args)
     String indent_type = "4";
     argparse::ArgParse agp = {
         .description = "c3 code formatting tool",
-        .usage = "[options] file1 .. fileN",
+        .usage = "[options] [-] file1 .. fileN",
         .options = {
             argparse::help_opt(),
             argparse::group_opt("Basic options"),
@@ -53,9 +53,18 @@ fn int main(String[] args)
     }
 
     foreach (String file_name : agp.arguments) {
-        if (catch err = format_file(file_name, max_line_width, force_mode, dry_mode, indent_type)) {
+        if (file_name == "-") {
+            // stdin mode.
+            if (catch err = format_stdin(max_line_width, force_mode, dry_mode, indent_type)) {
+                return 1;
+            }
+            break;
+        } else if (
+            catch err = format_file(file_name, max_line_width, force_mode, dry_mode, indent_type)
+        ) {
             return 1;
         }
+
     }
 
     return 0;
@@ -100,3 +109,22 @@ fn void? format_file(
     }
 }
 
+fn void? format_stdin(int max_line_width, bool force_mode, bool dry_mode, String indent_type)
+{
+    if (indent_type.len != 1) {
+        io::printfn("--indent= parameter must be a 2,4,8 or t, got '%s'", indent_type);
+        return io::GENERAL_ERROR?;
+    }
+
+    DString contents;
+    contents.init(mem);
+    defer contents.free();
+
+    contents.read_from_stream(io::stdin())!!;
+
+    CodeFmt fmt = codefmt::new_init(max_line_width: max_line_width, indent_type: indent_type[0]);
+    defer fmt.free();
+
+    String formatted = fmt.format(contents.str_view(), print_lex: false)!!;
+    io::print(formatted);
+}
