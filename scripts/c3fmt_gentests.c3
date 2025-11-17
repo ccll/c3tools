@@ -4,28 +4,28 @@ import std::collections::list;
 import c3lib::codegen;
 import c3tools::codefmt::codecorpus @public;
 
-fn void! load_corpus(CodeGen* code, String path) @local
+fn void? load_corpus(CodeGen* code, String path) @local
 {
     assert(path);
 
-    path::Path p = path::temp_new(path)!;
+    path::Path p = path::temp(path)!;
     io::printfn("Processing path: %s", p.str_view());
 
     if (!path::exists(p)) {
-        return IoError.FILE_NOT_FOUND?;
+        return io::FILE_NOT_FOUND?;
     }
     if (!path::is_dir(p)) {
-        return IoError.FILE_NOT_DIR?;
+        return io::FILE_NOT_DIR?;
     }
 
-    path::PathWalker fnwalk = fn bool! (Path p, bool is_dir, void* ctx) {
+    path::PathWalker fnwalk = fn bool? (Path p, bool is_dir, void* ctx) {
         CodeGen* code = ctx;
 
         if (is_dir) return false;
         if (!p.has_extension("txt")) return false;
 
         io::printfn("Parsing corpus: %s", p.str_view());
-        List(<CodeCorpus>)! corpus = codecorpus::new_parse(p.str_view());
+        List{CodeCorpus}? corpus = codecorpus::new_parse(p.str_view());
         defer (void)corpus.free();
 
         if (catch err = corpus) {
@@ -79,7 +79,8 @@ fn void! load_corpus(CodeGen* code, String path) @local
 
 fn int main(String[] args)
 {
-    CodeGen* code = CodeGen {}.new_init();
+    CodeGen code;
+    code.init();
     defer code.free();
 
     code.@module("test::c3tools::c3fmt_corpus @test");
@@ -87,13 +88,13 @@ fn int main(String[] args)
     code.@import("c3tools::codefmt::codecorpus @public");
     code.@import("std::io");
 
-    Path p = path::temp_cwd()!!;
+    Path p = path::tcwd()!!;
     io::printfn("cwd: %s", p.str_view());
 
     String cwd = "../test/c3tools/codefmt/c3fmt_corpus";
     String out_file = "../test/c3tools/codefmt/test_c3fmt_corpus.c3";
 
-    if (catch err = load_corpus(code, cwd)) {
+    if (catch err = load_corpus(&code, cwd)) {
         return 1;
     }
 
