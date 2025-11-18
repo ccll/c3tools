@@ -673,7 +673,7 @@ fn bool Ast.parse_structural(&ast, AstNode* node, Token* t, NodeParserState* sta
                         s.value = "";
                         state.sub_node = s;
                     } else {
-                        // Adding to existing type field (e.g. generic List(<MyType>) )
+                        // Adding to existing type field (e.g. generic List{MyType} )
                         ast.@allc_add(AstNode, &s.ftype, t);
                     }
                 case IDENT:

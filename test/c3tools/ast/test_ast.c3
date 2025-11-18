@@ -15,7 +15,7 @@ fn void test_node() {
     return 1;
 }
 `;
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
 
     String path = "foo.c3";
     Ast ast = ast::parse(contents.str_view(), path, print_lex: true);
@@ -54,7 +54,7 @@ fn void test_node() {
 fn void test_module_no_attr()
 {
     String code = `module test::std::c3lang::ast;`;
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
 
     String path = "foo.c3";
     Ast ast = ast::parse(contents.str_view(), path);
@@ -75,7 +75,7 @@ fn void test_module_imports()
 
    module test::std::c3lang::ast; // new module
    `;
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
 
     String path = "foo.c3";
     Ast ast = ast::parse(contents.str_view(), path);
@@ -191,7 +191,7 @@ fn void test_node() {
     return 1;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -220,11 +220,11 @@ fn void test_node() {
 fn void test_func_generic_ret_type()
 {
     String code = `module test::std::c3lang::ast;
-fn List(<int>) test_node() {
+fn List{int} test_node() {
     return 1;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -254,7 +254,7 @@ fn int[<2>] test_node() {
     return 1;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -284,7 +284,7 @@ fn MyType* test_node() {
     return 1;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -310,11 +310,11 @@ fn MyType* test_node() {
 fn void test_func_params()
 {
     String code = `module test::std::c3lang::ast;
-fn void test_node(int a, List(<int>) b) @test @inline @if(env::LIBC) {
+fn void test_node(int a, List{int} b) @test @inline @if(env::LIBC) {
     return 1;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -361,7 +361,7 @@ fn void test_import()
    import test::std::c3lang::ast::foo @test @if(env::FOO) ;
    import single_mod;
    `;
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
 
     String path = "foo.c3";
     Ast ast = ast::parse(contents.str_view(), path);
@@ -396,7 +396,7 @@ fn void test_docstring_module()
 <* My module *>
 module test::std::c3lang::ast;
    `;
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
 
     String path = "foo.c3";
     Ast ast = ast::parse(contents.str_view(), path, true);
@@ -427,7 +427,7 @@ fn void test_node() {
     return 1;
 }
    `;
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
 
     String path = "foo.c3";
     Ast ast = ast::parse(contents.str_view(), path, true);
@@ -462,7 +462,7 @@ My module
 *>
 module test::std::c3lang::ast;
    `;
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
 
     String path = "foo.c3";
     Ast ast = ast::parse(contents.str_view(), path, true);
@@ -520,7 +520,7 @@ fn void test_node(int a, int b = 2) @test @inline @if(env::LIBC) {
     return 1;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -567,7 +567,7 @@ fn MyType* MyFoo.test_node(&self) {
     return 1;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -604,7 +604,7 @@ fn void test_one_linefunc()
     String code = `module test::std::c3lang::ast;
 fn char! String.to_uchar(s, int base = 10) @inline @test => s.@to_integer(char, base) @foo;
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -649,7 +649,7 @@ macro MyFoo.@test_macro(self) {
     return 1;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -687,7 +687,7 @@ macro MyType(<$it>) MyFoo.@test_macro(self) {
     return 1;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -725,7 +725,7 @@ macro @test_macro(self) {
     return 1;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -764,7 +764,7 @@ macro @test_macro(Type* #self, $bar) {
     return 1;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -808,7 +808,7 @@ macro @test_macro(double... a, ...args) {
     return 1;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -852,7 +852,7 @@ macro @test_macro(Type* #self @unused, $bar @export("foo") @ok) {
     return 1;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -901,7 +901,7 @@ macro @for_each(list; @body(it))
         @body(x);
     }
 }//`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -949,7 +949,7 @@ enum Foo {
     FOO = SOME_OTHER_CONST,
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -996,7 +996,7 @@ enum Foo : int {
     FOO = SOME_OTHER_CONST,
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -1043,7 +1043,7 @@ enum Foo : int (String desc, bool active, Position pos) @test @if(env:FOO) {
     FOO = SOME_OTHER_CONST,
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -1092,7 +1092,7 @@ fault SomeFault @local @if(env::FOO)
     FOO = SOME_OTHER_CONST,
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -1137,10 +1137,10 @@ fn void test_interface_type()
     String code = `module test::std::c3lang::ast;
 interface NodeI @local {
     fn bool foo(Ast* ast, AstNode* node, Token* t) @local;
-    fn List(<int>) bar() @local;
+    fn List{int} bar() @local;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -1213,10 +1213,10 @@ interface NodeI @local {
     *>
     fn bool foo(Ast* ast, AstNode* node, Token* t) @local;
     <* another doc string *>
-    fn List(<int>) bar() @local;
+    fn List{int} bar() @local;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -1290,7 +1290,7 @@ struct MyStruct @local {
     MyType b @test;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -1345,10 +1345,10 @@ struct MyStruct @local {
     <* some stuff *>
     int a;
     <* another doc *>
-    List(<MyType>) b;
+    List{MyType} b;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -1407,7 +1407,7 @@ struct MyStruct @local {
     int b @test;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -1477,7 +1477,7 @@ struct MyStruct @local {
     int b @test;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -1545,7 +1545,7 @@ struct MyStruct @local {
     int b @test;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -1645,7 +1645,7 @@ struct MyStruct @local {
     int b @test;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -1704,11 +1704,11 @@ fn void test_struct_inline()
     String code = `module test::std::c3lang::ast;
 struct MyStruct @local {
     <*inline doc*>
-    inline List(<int>) base @test;
+    inline List{int} base @test;
     int b @test;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -1770,7 +1770,7 @@ union MyUnion @local {
     int b @test;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -1831,7 +1831,7 @@ struct MyUnion @local {
     }
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -1889,7 +1889,7 @@ bitstruct MyBit @local : char
     bool c : 7;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -1948,7 +1948,7 @@ struct MyBit {
     }
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -1994,7 +1994,7 @@ fn void test_def()
 <*def doc*>
 def Int32 = int;
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -2028,7 +2028,7 @@ fn void test_def_const()
 <*def doc*>
 def MY_CONST = int;
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -2062,7 +2062,7 @@ fn void test_def_attr_type()
 <*def doc*>
 def @Int32 = { @foo @bar };
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -2094,9 +2094,9 @@ fn void test_def_inline_list()
 {
     String code = `module test::std::c3lang::ast;
 <*def doc*>
-def IntList32 @test @foo = inline List(<int>);
+def IntList32 @test @foo = inline List{int};
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -2131,7 +2131,7 @@ fn void test_distinct()
 <*def doc*>
 distinct Int32 = int;
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -2165,7 +2165,7 @@ fn void test_constant()
 <*def doc*>
 const Int32 A_FOO_BAR = 123;
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -2199,7 +2199,7 @@ fn void test_def_fn_pointer()
 <*def doc*>
 def NodeParser = fn bool (Ast* ast, AstNode* node, Token* t, NodeParserState* state);
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -2237,7 +2237,7 @@ fn void test_module_imports_comma_sep()
    import std::io @test, test::math @foo;
 
    `;
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
 
     String path = "foo.c3";
     Ast ast = ast::parse(contents.str_view(), path, true);
@@ -2283,7 +2283,7 @@ macro fetch_add(ptr, y, AtomicOrdering $ordering = SEQ_CONSISTENT, bool $volatil
 	return $$atomic_fetch_add(ptr, y, $volatile, $ordering.ordinal, $alignment);
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -2320,7 +2320,7 @@ macro MyType.fetch_add(ptr, y, AtomicOrdering $ordering = SEQ_CONSISTENT, bool $
 	return $$atomic_fetch_add(ptr, y, $volatile, $ordering.ordinal, $alignment);
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -2357,7 +2357,7 @@ fn MyType* MyFoo.test_node(&self) {
     return 1;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -2395,7 +2395,7 @@ fn void test_module_variable()
 <*def doc*>
 int global_int @local @bar("foo") = 2;
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -2429,7 +2429,7 @@ fn void test_module_variable_tlocal()
 <*def doc*>
 tlocal int global_int @local @bar("foo") = 2;
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -2463,7 +2463,7 @@ fn void test_module_variable_custom_type()
 <*def doc*>
 MyType global_int @local @bar("foo");
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -2497,7 +2497,7 @@ fn void test_module_variable_array()
 <*def doc*>
 char[10] global_int @local @bar("foo");
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -2529,9 +2529,9 @@ fn void test_module_variable_generic()
 {
     String code = `module test::std::c3lang::ast;
 <*def doc*>
-List(<MyType>) global_int @local @bar("foo");
+List{MyType} global_int @local @bar("foo");
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -2576,7 +2576,7 @@ fn void test5(int a) => a * 2;
 fn void test6(int a) => a * 2;
 
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -2585,11 +2585,11 @@ fn void test6(int a) => a * 2;
     test::eq(3, ast.@node_len(ast.modules));
 
     AstModule* m = ast.@node_at(ast.modules, 0);
-    test::eq(m.hash, (Fnv32a)fnv32a::encode("test::std::c3lang::ast"));
+    test::eq(m.hash, (Fnv32a)fnv32a::hash("test::std::c3lang::ast"));
 
     m = ast.@node_at(ast.modules, 1);
-    test::eq(m.hash, (Fnv32a)fnv32a::encode("test::std::c3lang::best"));
+    test::eq(m.hash, (Fnv32a)fnv32a::hash("test::std::c3lang::best"));
 
     m = ast.@node_at(ast.modules, 2);
-    test::eq(m.hash, (Fnv32a)fnv32a::encode("test::std::c3lang::cest"));
+    test::eq(m.hash, (Fnv32a)fnv32a::hash("test::std::c3lang::cest"));
 }

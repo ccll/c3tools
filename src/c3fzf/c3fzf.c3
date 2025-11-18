@@ -105,7 +105,7 @@ fn void! find(FzfSettings* settings) @local
         settings.stdlib_path = std_abs.str_view();
     }
     
-    LspProject proj = LspProject.new_init(settings.project_path, settings.stdlib_path);
+    LspProject proj = project::new_lsp_project(settings.project_path, settings.stdlib_path);
     defer proj.free();
 
     if (catch err = proj.load()) {
@@ -119,7 +119,7 @@ fn void! find(FzfSettings* settings) @local
         return print_modules_list(settings, &proj);
     }
 
-    List(<ModuleDecl>) declarations;
+    List{ModuleDecl} declarations;
     declarations.temp_init(proj.modules.items_len);
 
     foreach (&sym : proj.modules.iter_items()) {
@@ -190,7 +190,7 @@ fn int cmp_str(String a, String b)
 
 fn void! print_modules_list(FzfSettings* settings, LspProject* proj) @local
 {
-    List(<String>) modules;
+    List{String} modules;
     modules.new_init(proj.modules.len());
     defer modules.free();
 
@@ -278,7 +278,7 @@ fn void print_decl_struct(AstTypeDefStructural* d, bool is_full_preview, uint in
         print_docs(d.docs);
     }
 
-    DString idt = dstring::temp_new();
+    DString idt = dstring::temp();
     for (uint i = 0; i < indent; i++) {
         idt.append(" ");
     }
@@ -397,7 +397,7 @@ fn String strip_path(FzfSettings* settings, String path) {
 }
 
 fn void! print_preview(
-    FzfSettings* settings, LspProject* proj, List(<ModuleDecl>) declarations, bool is_full_preview
+    FzfSettings* settings, LspProject* proj, List{ModuleDecl} declarations, bool is_full_preview
 ) @local
 {
 

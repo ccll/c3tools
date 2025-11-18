@@ -224,7 +224,7 @@ macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* 
             switch (prev_t) {
                 case RGENPAR:
                 case RVEC:
-                    // List(<Foo>){}.init(...)
+                    // (List{Foo}){}.init(...)
                     break;
                 case COMMA:
                     pre_space = true;

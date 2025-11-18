@@ -119,8 +119,8 @@ fn void test_custom_type_callback_unknown_type()
 fn void test_argparse_next_switch()
 {
 
-    List(<String>) args;
-    args.new_init(); 
+    List{String} args;
+    args.init(mem); 
     defer args.free();
 
     ArgParse agp = {

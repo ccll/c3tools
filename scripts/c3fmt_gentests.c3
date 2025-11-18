@@ -39,7 +39,7 @@ fn void? load_corpus(CodeGen* code, String path) @local
 
         foreach (c : corpus) {
             code.@fn("void test_corpus__%s__%s()", file_part, c.case_name) {
-                code.wn("CodeFmt fmt = CodeFmt.new_init()");
+                code.wn("CodeFmt fmt = codefmt::new_init()");
                 code.wn("defer fmt.free()");
                 // NOTE: adding \n to input + input[1..] when check for visual formatting reasons
                 code.wn("String input = `\n%s`", c.case_input);
@@ -53,8 +53,8 @@ fn void? load_corpus(CodeGen* code, String path) @local
                 code.wn(
                     "test::@check(codecorpus::compare_output(expected[1..], formatted), `format mismatch`)"
                 );
-                code.wn("String fmt_out = formatted.copy()");
-                code.wn("defer fmt_out.free()");
+                code.wn("String fmt_out = formatted.copy(mem)");
+                code.wn("defer fmt_out.free(mem)");
                 code.wn("formatted = fmt.format(fmt_out, print_lex: false)!!");
                 code.wn("assert(fmt_out.ptr != formatted.ptr)");
                 code.@if("expected[1..] != formatted") {

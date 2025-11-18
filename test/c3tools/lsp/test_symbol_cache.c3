@@ -8,7 +8,7 @@ import std::io;
 
 fn void test_add_symbols()
 {
-    SymbolCache* cache = SymbolCache.new_init(10);
+    SymbolCache* cache = symbols::new_symbol_cache(10);
     defer cache.free();
 
     test::eq(cache.items_len, 0);
@@ -29,7 +29,7 @@ fn void test_add_symbols()
 
 fn void test_find_insert_position()
 {
-    SymbolCache* cache = SymbolCache.new_init(10);
+    SymbolCache* cache = symbols::new_symbol_cache(10);
     defer cache.free();
 
     SymbolItem* items = cache.items();
@@ -57,7 +57,7 @@ fn void test_find_insert_position()
 
 fn void test_find_insert_at()
 {
-    SymbolCache* cache = SymbolCache.new_init(10);
+    SymbolCache* cache = symbols::new_symbol_cache(10);
     defer cache.free();
 
     SymbolItem* items = cache.items();
@@ -101,7 +101,7 @@ fn void test_find_insert_at_random()
     random::seed_entropy(&random);
 
     for (int i = 0; i < 100; i++) {
-        SymbolCache* cache = SymbolCache.new_init(100);
+        SymbolCache* cache = symbols::new_symbol_cache(100);
         defer cache.free();
         SymbolItem* items = cache.items();
 
@@ -140,7 +140,7 @@ fn void test_find_insert_at_random()
 
 fn void test_insert_name()
 {
-    SymbolCache* cache = SymbolCache.new_init(10);
+    SymbolCache* cache = symbols::new_symbol_cache(10);
     defer cache.free();
 
     char* names = cache.strings();
@@ -161,7 +161,7 @@ fn void test_insert_name()
 
 fn void test_item_add()
 {
-    SymbolCache* cache = SymbolCache.new_init(10);
+    SymbolCache* cache = symbols::new_symbol_cache(10);
     defer cache.free();
 
     char* names = cache.strings();
@@ -204,7 +204,7 @@ fn void test_item_add()
 
 fn void test_item_find()
 {
-    SymbolCache* cache = SymbolCache.new_init(10);
+    SymbolCache* cache = symbols::new_symbol_cache(10);
     defer cache.free();
 
     SymbolItem* items = cache.items();
@@ -238,7 +238,7 @@ fn void test_item_find()
 
 fn void test_grow()
 {
-    SymbolCache* cache = SymbolCache.new_init(4);
+    SymbolCache* cache = symbols::new_symbol_cache(4);
     defer cache.free();
 
     SymbolItem* items = cache.items();
@@ -308,7 +308,7 @@ fn void test_add_with_resize_and_validate()
     Lcg128Random random;
     random::seed_entropy(&random);
 
-    SymbolCache* cache = SymbolCache.new_init(100);
+    SymbolCache* cache = symbols::new_symbol_cache(100);
     DString buf;
     defer buf.free();
     defer cache.free();

@@ -144,8 +144,8 @@ different types.
 Example of parsing array of numbers:
 ```c3
 
-List(<int>) numbers;
-numbers.new_init(); 
+List{int} numbers;
+numbers.init(mem); 
 defer numbers.free();
 
 ArgParse agp = {
@@ -156,7 +156,7 @@ ArgParse agp = {
             .value = &numbers,
             .allow_many = true,
             .callback = fn void! (ArgOpt* opt, String value) {
-                List(<int>) * ctx = anycast(opt.value, List(<int>))!;
+                List{int} * ctx = anycast(opt.value, List{int})!;
                 int val = value.to_integer(int)!;
                 ctx.push(val);
             }
@@ -175,14 +175,13 @@ Special template option for --help/-h - prints usage
 *>
 macro help_opt(String help_prompt = "show this help message and exit")
 {
-    ArgOpt opt = {
+    return (ArgOpt) {
         ._arg_type = ArgType.HELP,
         .short_name = 'h',
         .long_name = "help",
         .help = help_prompt,
         .value = any_make(null,bool.typeid)
     };
-    return opt;
 }
 
 <*
@@ -190,8 +189,7 @@ Section separator in usage printout
 *>
 macro group_opt(String group_name)
 {
-    ArgOpt opt = {._arg_type = ArgType.GROUP, .help = group_name };
-    return opt;
+    return (ArgOpt){._arg_type = ArgType.GROUP, .help = group_name };
 }
 
 <*
@@ -206,8 +204,8 @@ Example:
 ```c3
 fn void test_argparse_next_all_together()
 {
-    List(<String>) args;
-    args.new_init(); 
+    List{String} args;
+    args.init(mem); 
     defer args.free();
 
     String[] argv = { "testprog", "-n", "5", "--num", "2", "--foo=3", "--", "-fex", "-I./foo"};

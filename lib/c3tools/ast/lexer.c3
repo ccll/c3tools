@@ -173,7 +173,7 @@ fn bool Lexer.next_token(&self)
  @param allocator: "optional allocator for resulting list"
  @return "list of all tokens in lexer string"
 *>
-fn List{lexer::Token} Lexer.new_parse_tokens(&self, Allocator allocator = allocator::heap())
+fn List{lexer::Token} Lexer.new_parse_tokens(&self, Allocator allocator = mem)
 {
     assert(self.file_begin, "not initialied");
     assert(self.file_begin == self.current, "already processed");
