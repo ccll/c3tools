@@ -217,7 +217,7 @@ def_statement_global
 ================================================================================
 def EnumSetType = $typefrom(private::type_for_enum_elements(Enum.elements)) @private;
 def ElementTest = fn bool(Type *type, any context);
-def TestFailFn = fn void! (bool to_fail);
+def TestFailFn = fn void? (bool to_fail);
 def FormatTzTestSpec = Triple(<TzDateTime, DateTimeFormat, String>);
 def IntList = ElasticArray(<int, 10>);
 def BenchmarkFn = fn void!(int) @if($$OLD_TEST);
@@ -228,10 +228,10 @@ def EnumSetType = $typefrom(
     private::type_for_enum_elements(Enum.elements)
 ) @private;
 def ElementTest = fn bool (Type* type, any context);
-def TestFailFn = fn void! (bool to_fail);
+def TestFailFn = fn void? (bool to_fail);
 def FormatTzTestSpec = Triple(<TzDateTime, DateTimeFormat, String>);
 def IntList = ElasticArray(<int, 10>);
-def BenchmarkFn = fn void! (int) @if($$OLD_TEST);
+def BenchmarkFn = fn void? (int) @if($$OLD_TEST);
 def @Align(y) = { @Align16(y / 2) };
 def @Test = { @noinline };
 ================================================================================
@@ -241,7 +241,7 @@ interface Printable @if("sasda")
 {
     fn String* to_string(Allocator allocator) @optional;
     fn String to_new_string(Allocator allocator) @optional @deprecated("Use to_string");
-    fn usz! to_format(Formatter* formatter) @optional;
+    fn usz? to_format(Formatter* formatter) @optional;
     fn usz* to_format(Formatter* formatter, Alooong Type, Maybe can, bool wrap, please) @optional;
     fn usz* to_format(Formatter* formatter, Alooong Type, Maybe can, bool wrap, please, or_maybe multiline) @optional;
     fn usz* to_format(Formatter* magic_comma, ) @optional;
@@ -251,7 +251,7 @@ interface Printable @if("sasda")
 {
     fn String* to_string(Allocator allocator) @optional;
     fn String to_new_string(Allocator allocator) @optional @deprecated("Use to_string");
-    fn usz! to_format(Formatter* formatter) @optional;
+    fn usz? to_format(Formatter* formatter) @optional;
     fn usz* to_format(
         Formatter* formatter, Alooong Type, Maybe can, bool wrap, please
     ) @optional;
