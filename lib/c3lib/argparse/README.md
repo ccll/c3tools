@@ -69,7 +69,7 @@ fn void test_custom_type_callback_unknown_type()
 {
 
     char val = '\0';
-    ArgParseCallbackFn cbf = fn void! (ArgOpt* opt, String value) {
+    ArgParseCallbackFn cbf = fn void? (ArgOpt* opt, String value) {
         io::printfn("flt--callback");
         test::eq(value, "bar");
         *anycast(opt.value, char)! = value[0];
@@ -89,7 +89,7 @@ fn void test_custom_type_callback_unknown_type()
                 .short_name = 'o',
                 .long_name = "other",
                 .value = &my_app_state,
-                .callback = fn void! (ArgOpt* opt, String value) {
+                .callback = fn void? (ArgOpt* opt, String value) {
                     ArgParse* ctx = anycast(opt.value, ArgParse)!;
                     io::printfn("other--callback");
                     // NOTE: pretends to update important app struct

@@ -457,7 +457,7 @@ My module
 @test
 @param [&inout] foo "some info"
 @return "some stuff"
-@return! Fault.SOME,IoError.ANOTHER 
+@return? Fault.SOME,IoError.ANOTHER 
 @requre a > 0, a < d
 *>
 module test::std::c3lang::ast;
@@ -602,7 +602,7 @@ fn MyType* MyFoo.test_node(&self) {
 fn void test_one_linefunc()
 {
     String code = `module test::std::c3lang::ast;
-fn char! String.to_uchar(s, int base = 10) @inline @test => s.@to_integer(char, base) @foo;
+fn char? String.to_uchar(s, int base = 10) @inline @test => s.@to_integer(char, base) @foo;
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
     DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);

@@ -754,7 +754,7 @@ fn void test_fn_decl()
 
 fn void test_fn_decl_bang_is_close()
 {
-    String contents = `fn void! foo(int a)`;
+    String contents = `fn void? foo(int a)`;
     Lexer lexer;
     lexer::init(&lexer, contents);
     List{lexer::Token} toks = lexer.new_parse_tokens();

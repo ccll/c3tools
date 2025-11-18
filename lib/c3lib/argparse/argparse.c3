@@ -155,7 +155,7 @@ ArgParse agp = {
             .long_name = "num",
             .value = &numbers,
             .allow_many = true,
-            .callback = fn void! (ArgOpt* opt, String value) {
+            .callback = fn void? (ArgOpt* opt, String value) {
                 List{int} * ctx = anycast(opt.value, List{int})!;
                 int val = value.to_integer(int)!;
                 ctx.push(val);
@@ -222,7 +222,7 @@ fn void test_argparse_next_all_together()
 
 Switching over options:
 ```c3
-int! sum_args(String argv[]) 
+int? sum_args(String argv[]) 
 { 
     ArgParse agp = {
         .description = "Test number sum program",
