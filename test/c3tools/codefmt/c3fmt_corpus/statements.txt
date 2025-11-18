@@ -995,6 +995,7 @@ fn void? test()
 {
 if (catch excuse = optional_value)
             {
+    switch (execuse) { 
     case NoHomework.DOG_ATE_MY_HOMEWORK:
                 io::printn("Dog ate your file");
 case IoError.FILE_NOT_FOUND:
@@ -1003,19 +1004,22 @@ case IoError.FILE_NOT_FOUND:
             io::printfn("Unexpected Excuse: %s", excuse);
             return excuse?;}
     }
+            }
 }
 
 --------------------------------------------------------------------------------
 fn void? test()
 {
     if (catch excuse = optional_value) {
-        case NoHomework.DOG_ATE_MY_HOMEWORK:
-            io::printn("Dog ate your file");
-        case IoError.FILE_NOT_FOUND:
-            io::printn("File not found");
-        default: {
-            io::printfn("Unexpected Excuse: %s", excuse);
-            return excuse?;
+        switch (excuse) {
+            case NoHomework.DOG_ATE_MY_HOMEWORK:
+                io::printn("Dog ate your file");
+            case IoError.FILE_NOT_FOUND:
+                io::printn("File not found");
+            default: {
+                io::printfn("Unexpected Excuse: %s", excuse);
+                return excuse?;
+            }
         }
     }
 }

@@ -291,6 +291,7 @@ macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* 
                 case RVEC:
                 case RGENPAR:
                 case STAR:
+                // TODO: adapter new generic syntax {}
                 case GREATER:  // new generic syntax Foo<[bar]>
                 case QUESTION:
                     break;  // no space

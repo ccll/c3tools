@@ -1479,8 +1479,8 @@ enum TokenType : uint
     GREATER_EQ,  // >=
     IMPLIES,  // =>
     LESS_EQ,  // <=
-    LBRAPIPE,  // {|
-    LGENPAR,  // (<
+    // LBRAPIPE,  // {|     // TODO: removed, use do {...}
+    // LGENPAR,  // (<     // TODO: removed
     LVEC,  // [<
     MINUS_ASSIGN,  // -=
     MINUSMINUS,  // --
@@ -1490,8 +1490,8 @@ enum TokenType : uint
     OR,  // ||
     PLUS_ASSIGN,  // +=
     PLUSPLUS,  // ++
-    RBRAPIPE,  // |}
-    RGENPAR,  // >)
+    // RBRAPIPE,  // |}     // TODO: removed
+    // RGENPAR,  // >)     // TODO: removed
     RVEC,  // >]
     QUESTQUEST,  // ??
     SCOPE,  // ::
@@ -1563,17 +1563,17 @@ enum TokenType : uint
     USZ,
     FLOAT128,
     ANY,
-    ANYFAULT,
+    ANYFAULT,   // TODO: replaced by fault
     TYPEID,
 
     // Keywords
     ASSERT,
     ASM,
     STRUCT,
-    DEF,
-    DISTINCT,
+    DEF,    // TODO: replaced by alias
+    DISTINCT,   // TODO: replaced by typedef
     BITSTRUCT,
-    FAULT,
+    FAULT,  // TODO: replaced by faultdef
     UNION,
     BREAK,
     CASE,
