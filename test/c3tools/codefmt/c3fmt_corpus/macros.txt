@@ -58,7 +58,7 @@ macro SomeType   * !
     }
 }
 --------------------------------------------------------------------------------
-macro SomeType*! @for_each(list; @body(it))
+macro SomeType*? @for_each(list; @body(it))
 {
     for ($typeof(list) x = list; x; x = x.next) {
         @body(x);

@@ -111,7 +111,7 @@ Descr @param @ensure ignored
 
 @require foo > 1 
 @return IoError.FOO, EioError.BAR
-@return! IoError.FOO, EioError.BAR
+@return? IoError.FOO, EioError.BAR
 @require $defined(resource.open, resource.open()),  ``Expected resource to have an "open" function``
 @require resource != nil
 @require $assignable(resource.open(), void*)
@@ -140,7 +140,7 @@ main() { return;}
 
  @require foo > 1
  @return IoError.FOO, EioError.BAR
- @return! IoError.FOO, EioError.BAR
+ @return? IoError.FOO, EioError.BAR
  @require $defined(resource.open, resource.open()), ``Expected resource to have an "open" function``
  @require resource != nil
  @require $assignable(resource.open(), void*)

@@ -83,17 +83,17 @@ fn void main()
 comments_inside_func_args
 ================================================================================
 
-fn String[]! 
+fn String[]? 
 Foo.main(
-String[] args, int* foo, List(<float>) /* some */     
+String[] args, int* foo, List{float} /* some */     
 bar, na   ,    varg...
 ) { return   0   ;}
 
 --------------------------------------------------------------------------------
-fn String[]! Foo.main(
+fn String[]? Foo.main(
     String[] args,
     int* foo,
-    List(<float>)   /* some */
+    List{float}   /* some */
     bar,
     na,
     varg...
@@ -105,17 +105,17 @@ fn String[]! Foo.main(
 comments_single_line_forces_multiline
 ================================================================================
 
-fn String[]! 
+fn String[]? 
 Foo.main(
 // coment
-List(<float>)
+List{float}
 bar, int a
 ) { return   0   ;}
 
 --------------------------------------------------------------------------------
-fn String[]! Foo.main(
+fn String[]? Foo.main(
     // coment
-    List(<float>) bar,
+    List{float} bar,
     int a
 )
 {

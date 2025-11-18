@@ -482,6 +482,7 @@ fn bool CodeFmt._resolve__bracket_is_complex_expr(&self) @private
     return exp_count > 1;
 }
 
+// TODO: we don't need this resolver anymore, since ! is replaced by ?
 <*
  resolve  bool! c vs if(!foo)
 *>
@@ -702,7 +703,7 @@ fn bool CodeFmt._resolve__prev_is_binexp(&self) @private
     do {
         if (has_parens) {
             // simple cast (void*)
-            // generic cast (Foo(<void>)*) / array cast (char[8]*)
+            // generic cast (Foo{void}*) / array cast (char[8]*)
             if (has_type) {
                 if(has_typeof || !has_vars) is_cast = true;
                 break;

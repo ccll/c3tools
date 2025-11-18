@@ -238,7 +238,7 @@ fn List{int} test_node() {
 
     test::eq(func.type, TokenType.FN);
     test::eq(ast.@node_join(func.name, contents), "test_node");
-    test::eq(ast.@node_join(func.ftype, contents), "List,(<,int,>)");
+    test::eq(ast.@node_join(func.ftype, contents), "List,{,int,}");
     test::eq(func.params, null);
 
     io::printf("\n\n``%s``", code[func.istart .. math::min((isz)func.iend, (isz)(code.len - 1))]);
@@ -342,7 +342,7 @@ fn void test_node(int a, List{int} b) @test @inline @if(env::LIBC) {
     param = (AstCallableParam*)ast.@node_at(func.params, 1);
     test::eq(param.type, TokenType.VAR);
     test::eq(param.value, "b");
-    test::eq(ast.@node_join(param.param_type, contents), "List,(<,int,>)");
+    test::eq(ast.@node_join(param.param_type, contents), "List,{,int,}");
 
     test::ne(func.attributes, null);
     test::eq(ast.@node_len(func.attributes), 3);
@@ -683,7 +683,7 @@ macro MyFoo.@test_macro(self) {
 fn void test_macro_type_with_ret_type()
 {
     String code = `module test::std::c3lang::ast;
-macro MyType(<$it>) MyFoo.@test_macro(self) {
+macro MyType{$it} MyFoo.@test_macro(self) {
     return 1;
 }
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
@@ -700,7 +700,7 @@ macro MyType(<$it>) MyFoo.@test_macro(self) {
     test::ne(func, null);
 
     test::eq(func.type, TokenType.MACRO);
-    test::eq(ast.@node_join(func.ftype, contents), "MyType,(<,$it,>)");
+    test::eq(ast.@node_join(func.ftype, contents), "MyType,{,$it,}");
     test::eq(ast.@node_join(func.name, contents), "MyFoo,@test_macro");
 
     test::eq(ast.@node_len(func.params), 1);
@@ -1189,7 +1189,7 @@ interface NodeI @local {
     test::ne(func, null);
 
     test::eq(func.type, TokenType.FN);
-    test::eq(ast.@node_join(func.ftype, contents), `List,(<,int,>)`);
+    test::eq(ast.@node_join(func.ftype, contents), `List,{,int,}`);
     test::eq(ast.@node_join(func.name, contents), "bar");
     test::eq(ast.@node_join(func.attributes, contents), "@local");
 
@@ -1266,7 +1266,7 @@ interface NodeI @local {
     test::ne(func, null);
 
     test::eq(func.type, TokenType.FN);
-    test::eq(ast.@node_join(func.ftype, contents), `List,(<,int,>)`);
+    test::eq(ast.@node_join(func.ftype, contents), `List,{,int,}`);
     test::eq(ast.@node_join(func.name, contents), "bar");
     test::eq(ast.@node_join(func.attributes, contents), "@local");
     test::eq(ast.@node_join(func.docs, contents), "<* another doc string ");
@@ -1382,7 +1382,7 @@ struct MyStruct @local {
     test::ne(member, null);
     test::eq(member.type, TokenType.TYPE_IDENT);
     test::eq(member.value, "b");
-    test::eq(ast.@node_join(member.ftype, contents), "List,(<,MyType,>)");
+    test::eq(ast.@node_join(member.ftype, contents), "List,{,MyType,}");
     test::eq(ast.@node_join(member.attributes, contents), "");
     test::eq(ast.@node_join(member.docs, contents), "<* another doc ");
 
@@ -1735,7 +1735,7 @@ struct MyStruct @local {
     test::ne(member, null);
     test::eq(member.type, TokenType.INLINE);
     test::eq(member.value, "base");
-    test::eq(ast.@node_join(member.ftype, contents), `List,(<,int,>)`);
+    test::eq(ast.@node_join(member.ftype, contents), `List,{,int,}`);
 
     test::eq(ast.@node_join(member.attributes, contents), "@test");
     test::eq(ast.@node_join(member.docs, contents), `<*inline doc`);
@@ -2114,7 +2114,7 @@ def IntList32 @test @foo = inline List{int};
     test::eq(ast.@node_join(struct_type.attributes, contents), "@test,@foo");
     test::eq(ast.@node_join(struct_type.docs, contents), "<*def doc");
     // NOTE: inline expected to be excluded from type fields
-    test::eq(ast.@node_join(struct_type.ftype, contents), "List,(<,int,>)");
+    test::eq(ast.@node_join(struct_type.ftype, contents), "List,{,int,}");
 
     io::printf(
         "\n\n``%s``",
@@ -2548,7 +2548,7 @@ List{MyType} global_int @local @bar("foo");
 
     test::eq(ast.@node_join(var_type.attributes, contents), `@local,@bar("foo")`);
     test::eq(ast.@node_join(var_type.docs, contents), "<*def doc");
-    test::eq(ast.@node_join(var_type.ftype, contents), "List,(<,MyType,>)");
+    test::eq(ast.@node_join(var_type.ftype, contents), "List,{,MyType,}");
 
     io::printf(
         "\n\n``%s``",

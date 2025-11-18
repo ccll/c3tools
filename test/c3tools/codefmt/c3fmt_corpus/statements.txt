@@ -918,7 +918,7 @@ fn  char[   ]   ! test   ()
 }
 
 --------------------------------------------------------------------------------
-fn char[]! test()
+fn char[]? test()
 {
     defer (catch err) {
         io::printfn("Excuse found: %s", err);
@@ -941,7 +941,7 @@ fn  char[   ]   ! test   ()
 }
 
 --------------------------------------------------------------------------------
-fn char[]! test()
+fn char[]? test()
 {
     defer catch io::printfn("Excuse found: %s", err);
     return IoError.FILE_NOT_FOUND?;
@@ -959,7 +959,7 @@ fn  char[   ]   ! test   ()
 }
 
 --------------------------------------------------------------------------------
-fn char[]! test()
+fn char[]? test()
 {
     defer catch {
         io::printfn("Excuse found: %s", err);
@@ -980,7 +980,7 @@ if (catch excuse = foo(call, dab))
 }
 
 --------------------------------------------------------------------------------
-fn char[]! test()
+fn char[]? test()
 {
     if (catch excuse = foo(call, dab)) {
         // Return the excuse with ? operator
@@ -991,7 +991,7 @@ fn char[]! test()
 if_catch_switch
 ================================================================================
 
-fn void! test()
+fn void? test()
 {
 if (catch excuse = optional_value)
             {
@@ -1006,7 +1006,7 @@ case IoError.FILE_NOT_FOUND:
 }
 
 --------------------------------------------------------------------------------
-fn void! test()
+fn void? test()
 {
     if (catch excuse = optional_value) {
         case NoHomework.DOG_ATE_MY_HOMEWORK:
@@ -1031,7 +1031,7 @@ fn  char[   ]   ! test   ()
 }
 
 --------------------------------------------------------------------------------
-fn char[]! test()
+fn char[]? test()
 {
     c.@foo(a, b; xyz, abcj) {
         xyz[1] = 4;
@@ -1049,7 +1049,7 @@ fn  char[   ]   ! test   ()
 }
 
 --------------------------------------------------------------------------------
-fn char[]! test()
+fn char[]? test()
 {
     int foo = {|
         int a = 0;
@@ -1068,7 +1068,7 @@ fn  char[   ]   ! test   ()
 }
 
 --------------------------------------------------------------------------------
-fn char[]! test()
+fn char[]? test()
 {
     int foo = {|
         int a = 0;
@@ -1231,13 +1231,13 @@ fn void main()
     int[<2>] a = { 23, 11 };
     int[<2>] b = { 2, 1 };
     int[<3>] a = { 11, 22, 33 };
-    List(<int >) l = List.new(doo, 1);
+    List{int } l = List.new(doo, 1);
     int[<4>] b = a.xxzx;                         // b = { 11, 11, 33, 11 }
     int c = b.w;                                 // c = 11;
     char[<4>] color = { 0x11, 0x22, 0x33, 0xFF };
     char red = color.r;                          // red = 0x11
     test_float(1.0, &f);
-    foo_test::test(<int, double>) ( 1.0, &g );
+    foo_test::test{int, double} ( 1.0, &g );
     int[<2>] c = { a[0] * b[0], a[1] * b[1] };
 }
 
@@ -1247,13 +1247,13 @@ fn void main()
     int[<2>] a = { 23, 11 };
     int[<2>] b = { 2, 1 };
     int[<3>] a = { 11, 22, 33 };
-    List(<int>) l = List.new(doo, 1);
+    List{int} l = List.new(doo, 1);
     int[<4>] b = a.xxzx;  // b = { 11, 11, 33, 11 }
     int c = b.w;  // c = 11;
     char[<4>] color = { 0x11, 0x22, 0x33, 0xFF };
     char red = color.r;  // red = 0x11
     test_float(1.0, &f);
-    foo_test::test(<int, double>)(1.0, &g);
+    foo_test::test{int, double}(1.0, &g);
     int[<2>] c = { a[0] * b[0], a[1] * b[1] };
 }
 ================================================================================
@@ -1343,13 +1343,13 @@ import std::core::test    @public;
 import std::core:: builtin;
 import 
 std::io;
-module math_tests::complex   (< ElementType >) @test;
+module math_tests::complex   { ElementType } @test;
 --------------------------------------------------------------------------------
 module test::std::core::test @test @if(FOO || BAR);
 import std::core::test @public;
 import std::core::builtin;
 import std::io;
-module math_tests::complex(<ElementType>) @test;
+module math_tests::complex{ElementType} @test;
 ================================================================================
 const
 ================================================================================
@@ -1397,7 +1397,7 @@ extern fn int printf(char *str, ...);
 extern fn void* __asan_region_is_poisoned(void* beg, usz size);
 extern fn void __sanitizer_weak_hook_strcmp(void* called_pc, ZString s1, ZString s2, CInt result);
 extern fn Char16** _win_command_line_to_argv_w(ushort* cmd_line, int* argc_ptr) @extern("CommandLineToArgvW");
-extern fn int! maybe();
+extern fn int? maybe();
 extern fn Win32_BOOL win32_QueryPerformanceFrequency(Win32_LARGE_INTEGER* lpFrequency) @extern("QueryPerformanceFrequency");
 extern Char16* _win_command_line_to_argv_w;
 extern const int FOO @extern("foo1");
@@ -1412,7 +1412,7 @@ extern fn void __sanitizer_weak_hook_strcmp(
     void* called_pc, ZString s1, ZString s2, CInt result
 );
 extern fn Char16** _win_command_line_to_argv_w(ushort* cmd_line, int* argc_ptr) @extern("CommandLineToArgvW");
-extern fn int! maybe();
+extern fn int? maybe();
 extern fn Win32_BOOL win32_QueryPerformanceFrequency(
     Win32_LARGE_INTEGER* lpFrequency
 ) @extern("QueryPerformanceFrequency");
@@ -1628,7 +1628,7 @@ fn  char[   ]   ! test   ()
 }
 
 --------------------------------------------------------------------------------
-fn char[]! test()
+fn char[]? test()
 {
     {|
         int a = 0;
@@ -1769,12 +1769,12 @@ TestContext state @local  = {
 --------------------------------------------------------------------------------
 TestContext state @local = {
     .foo = 1,
-    .setup_fn = fn void! () {
+    .setup_fn = fn void? () {
         io::printn("new test setup");
         // initialize something heavy (maybe a DB)
         state.n_runs = 777;
     },
-    .teardown_fn = fn void! () {  // inline
+    .teardown_fn = fn void? () {  // inline
         state.n_runs = 0;
         io::printn("test teardown");  // inline
     },
@@ -1788,7 +1788,7 @@ TestContext state @local = {
     .foo = 1, 
     .sub_struct ={
         .another = {1, 2, 3},
-        .setup_fn = fn void! (int a, int b, $typeof(c) c) {
+        .setup_fn = fn void? (int a, int b, $typeof(c) c) {
             io::printn("new test setup");
             // initialize something heavy (maybe a DB)
             state.n_runs = 777;
@@ -1811,14 +1811,14 @@ TestContext state @local = {
             2,
             3
         },
-        .setup_fn = fn void! (int a, int b, $typeof(c) c) {
+        .setup_fn = fn void? (int a, int b, $typeof(c) c) {
             io::printn("new test setup");
             // initialize something heavy (maybe a DB)
             state.n_runs = 777;
         },
         .sub_field = 1
     },
-    .teardown_fn = fn void! () {  // inline
+    .teardown_fn = fn void? () {  // inline
         state.n_runs = 0;
         io::printn("test teardown");  // inline
     },
@@ -1848,7 +1848,7 @@ TestContext state @local = {
         .sub_field = 1,
         .sub_field = 2
     },
-    .teardown_fn = fn void! () {  // inline
+    .teardown_fn = fn void? () {  // inline
         state.n_runs = 0;
         io::printn("test teardown");  // inline
     },
@@ -1917,7 +1917,7 @@ fn  char[   ]   ! test   ()
 }
 
 --------------------------------------------------------------------------------
-fn char[]! test()
+fn char[]? test()
 {
     call( {|
         io::printfn("Send %d", a);
@@ -2059,7 +2059,7 @@ fn void test()
         .options = {
             {
                 .short_name = 1,
-                .callback = fn void! (int a) {
+                .callback = fn void? (int a) {
                     return 0;
                 },
             }
@@ -2073,7 +2073,7 @@ fn void test()
         .options = {
             {
                 .short_name = 1,
-                .callback = fn void! (int a) {
+                .callback = fn void? (int a) {
                     return 0;
                 },
             }
@@ -2091,7 +2091,7 @@ fn void test()
                 .short_name = 'R',
                 .value = &config,
                 .help = "optimization level [default: O0]",
-                .callback = fn void! (ArgOpt* opt, String value) {
+                .callback = fn void? (ArgOpt* opt, String value) {
                     int level = value.to_integer(int)!;
                     if (level ) {
                         return 0;
@@ -2103,7 +2103,7 @@ fn void test()
                 .short_name = 'O',
                 .value = &config,
                 .help = "optimization level [default: O0]",
-                .callback = fn void! (ArgOpt* opt, String value) {
+                .callback = fn void? (ArgOpt* opt, String value) {
                     int level = value.to_integer(int)!;
                     if (level ) {
                         return 0;
@@ -2125,7 +2125,7 @@ fn void test()
                 .short_name = 'R',
                 .value = &config,
                 .help = "optimization level [default: O0]",
-                .callback = fn void! (ArgOpt* opt, String value) {
+                .callback = fn void? (ArgOpt* opt, String value) {
                     int level = value.to_integer(int)!;
                     if (level) {
                         return 0;
@@ -2139,7 +2139,7 @@ fn void test()
                 .short_name = 'O',
                 .value = &config,
                 .help = "optimization level [default: O0]",
-                .callback = fn void! (ArgOpt* opt, String value) {
+                .callback = fn void? (ArgOpt* opt, String value) {
                     int level = value.to_integer(int)!;
                     if (level) {
                         return 0;

@@ -159,16 +159,16 @@ generic_vec_expr
 ================================================================================
 
 fn void main() { 
-List(<Foo*>) lfoo;
-List(<Foo*>)* lfoo = List(<Foo*>){}.init(bar: 1);
+List{Foo*} lfoo;
+List{Foo*}* lfoo = List{Foo*}{}.init(bar: 1);
 int[<2>]* lfoo = int[<2 >]{}.init(bar: 1);
 }
 
 --------------------------------------------------------------------------------
 fn void main()
 {
-    List(<Foo*>) lfoo;
-    List(<Foo*>)* lfoo = List(<Foo*>){}.init(bar: 1);
+    List{Foo*} lfoo;
+    List{Foo*}* lfoo = List{Foo*}{}.init(bar: 1);
     int[<2>]* lfoo = int[<2>]{}.init(bar: 1);
 }
 ================================================================================
@@ -245,22 +245,22 @@ macro bool char_is_base64(char c)
 bang_expressions
 ================================================================================
 
-fn List(<int>)! foo() => 0;
-fn int[<2>]! foo() => 0;
+fn List{int}? foo() => 0;
+fn int[<2>]? foo() => 0;
 
-def TFoo = fn List(<int>)! foo();
-def TFoo = fn int[<3>]! foo();
-def TFoo = fn int! foo();
-def TFoo = fn int*! foo();
+def TFoo = fn List{int}? foo();
+def TFoo = fn int[<3>]? foo();
+def TFoo = fn int? foo();
+def TFoo = fn int*? foo();
 
-fn void! main() { 
-    char! c = call();
-    char*! c = call();
+fn void? main() { 
+    char? c = call();
+    char*? c = call();
     char c = call()!;
     char c = !call();
-    int[<2>]! c = call();
-    List<[2]>! c = call();
-    List(<2>)! c = call();
+    int[<2>]? c = call();
+    List<[2]>? c = call();
+    List{2}? c = call();
     if(!foo()) return 0;
     if(!foo() && (!(foo | bar) && !foo)) return 0;
     return !(!foo());
@@ -268,23 +268,23 @@ fn void! main() {
 }
 
 --------------------------------------------------------------------------------
-fn List(<int>)! foo() => 0;
-fn int[<2>]! foo() => 0;
+fn List{int}? foo() => 0;
+fn int[<2>]? foo() => 0;
 
-def TFoo = fn List(<int>)! foo();
-def TFoo = fn int[<3>]! foo();
-def TFoo = fn int! foo();
-def TFoo = fn int*! foo();
+def TFoo = fn List{int}? foo();
+def TFoo = fn int[<3>]? foo();
+def TFoo = fn int? foo();
+def TFoo = fn int*? foo();
 
-fn void! main()
+fn void? main()
 {
-    char! c = call();
-    char*! c = call();
+    char? c = call();
+    char*? c = call();
     char c = call()!;
     char c = !call();
-    int[<2>]! c = call();
-    List <[2] >! c = call();
-    List(<2>)! c = call();
+    int[<2>]? c = call();
+    List <[2] >? c = call();
+    List{2}? c = call();
     if (!foo()) return 0;
     if (!foo() && (!(foo | bar) && !foo)) return 0;
     return !(!foo());
@@ -422,7 +422,7 @@ fn void main()
     };
     long e10 = String.to_long() ?? NumberConversion.MALFORMED_FLOAT ? !;
     url.path = decode(allocator) ?? UrlParsingResult.INVALID_PATH ? !;
-    int! b = foo((a + 3) ?? 2);
+    int? b = foo((a + 3) ?? 2);
     char* data4 = $embed("fiek") ?? null;
     bool r = foo ? !bar : !vrr;
     bool r = foo ? (!bar) : !vrr;
@@ -438,7 +438,7 @@ fn void main()
     };
     long e10 = String.to_long() ?? NumberConversion.MALFORMED_FLOAT?!;
     url.path = decode(allocator) ?? UrlParsingResult.INVALID_PATH?!;
-    int! b = foo((a + 3) ?? 2);
+    int? b = foo((a + 3) ?? 2);
     char* data4 = $embed("fiek") ?? null;
     bool r = foo ?!bar : !vrr;
     bool r = foo ? (!bar) : !vrr;
