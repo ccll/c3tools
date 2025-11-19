@@ -149,6 +149,7 @@ macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* 
                 case STAR:
                 case LBRACKET:
                 case RGENPAR:
+                case RBRACE:
                 case RVEC:
                 case BANG:
                     break;
@@ -200,6 +201,7 @@ macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* 
                 case CT_TYPE_IDENT:
                 case RPAREN:
                 case RGENPAR:
+                case RBRACE:
                 case RVEC:
                 case LPAREN:
                     break;
@@ -213,6 +215,7 @@ macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* 
         case RBRACE:
             // array related brace
             switch (prev_t) {
+                case TYPE_IDENT:
                 case LBRACE:
                     // empty {}
                     break;
@@ -222,7 +225,9 @@ macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* 
             break;
         case LBRACE:
             switch (prev_t) {
+                case TYPE_IDENT:
                 case RGENPAR:
+                case RBRACE:
                 case RVEC:
                     // (List{Foo}){}.init(...)
                     break;
@@ -290,6 +295,7 @@ macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* 
                 case CT_TYPE_IDENT:
                 case RVEC:
                 case RGENPAR:
+                case RBRACE:
                 case STAR:
                 case GREATER:  // new generic syntax Foo<[bar]>
                 case QUESTION:
@@ -392,6 +398,7 @@ macro bool CodeFmt._resolve_default_space(&self, NodeParserState* state, Token* 
         case CONTINUE:
         case RVEC:
         case RGENPAR:
+        case RBRACE:
         case TRY:
         case FN:
         case IF:
@@ -503,6 +510,7 @@ fn bool CodeFmt._resolve__prev_bang_type(&self) @private
         case TYPE_IDENT:
         case RVEC:
         case RGENPAR:
+        case RBRACE:
         case STAR:
         case GREATER:  // new generic notation ]>
             return true;
@@ -656,6 +664,7 @@ fn bool CodeFmt._resolve__prev_is_binexp(&self) @private
             case RVEC:
             case LGENPAR:
             case RGENPAR:
+            case RBRACE:
                 has_brackets = true;
             case BIT_AND_ASSIGN:
             case BIT_OR_ASSIGN:
@@ -764,6 +773,8 @@ fn usz CodeFmt._resolve__next_is_cast_and_dump(&self, usz current_idx) @private
             case RVEC:
             case LGENPAR:
             case RGENPAR:
+            case LBRACE:
+            case RBRACE:
                 break;
             default:
                 is_cast = false;
@@ -827,6 +838,8 @@ fn bool CodeFmt._resolve__prev_is_cast(&self) @private
             case RVEC:
             case LGENPAR:
             case RGENPAR:
+            case LBRACE:
+            case RBRACE:
             case LBRACKET:
             case RBRACKET:
             case QUESTION:
@@ -870,6 +883,7 @@ fn bool CodeFmt._resolve__next_question_is_error(&self, usz current_idx) @privat
         case RBRACKET:
         case RVEC:
         case RGENPAR:
+        case RBRACE:
         case INVALID_TOKEN:
             return false;
         case BANG:
