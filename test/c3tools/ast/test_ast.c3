@@ -504,7 +504,7 @@ module test::std::c3lang::ast;
     contract = ast.@node_at(m.docs.contracts, 4);
     test::eq(contract.value, "@return");
     test::eq(contract.type, TokenType.AT_IDENT);
-    test::eq(ast.@node_join(contract.items, contents), `!,Fault,.,SOME,,,IoError,.,ANOTHER`);
+    test::eq(ast.@node_join(contract.items, contents), `?,Fault,.,SOME,,,IoError,.,ANOTHER`);
 
     contract = ast.@node_at(m.docs.contracts, 5);
     test::eq(contract.value, "@requre");
@@ -617,7 +617,7 @@ fn char? String.to_uchar(s, int base = 10) @inline @test => s.@to_integer(char, 
     test::ne(func, null);
 
     test::eq(func.type, TokenType.FN);
-    test::eq(ast.@node_join(func.ftype, contents), "char,!");
+    test::eq(ast.@node_join(func.ftype, contents), "char,?");
     test::eq(ast.@node_join(func.name, contents), "String,to_uchar");
     test::eq(ast.@node_join(func.attributes, contents), "@inline,@test");
     test::ne(func.params, null);

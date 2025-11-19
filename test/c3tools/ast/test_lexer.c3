@@ -764,7 +764,7 @@ fn void test_fn_decl_bang_is_close()
     // foreach(i, t: toks) io::printf("%d: %s", i, t);
     // foreach(i, t: toks) io::printf(",%s", t.type);
 
-    TokenType[] expected = { FN, TYPE_IDENT, BANG, IDENT, LPAREN, TYPE_IDENT, IDENT, RPAREN, EOF };
+    TokenType[] expected = { FN, TYPE_IDENT, QUESTION, IDENT, LPAREN, TYPE_IDENT, IDENT, RPAREN, EOF };
 
     // module IDENT[foo] ; EOF
     test::eq(expected.len, toks.len());
