@@ -47,7 +47,7 @@ macro size($Type)
 simple_macro_body_definition
 ================================================================================
 
-macro SomeType   * !
+macro SomeType   * ?
    @for_each(   list   ; @body(   it  ))
 {
     for ($typeof(list)

@@ -901,7 +901,7 @@ fn void main()
 defer_catch_full_example
 ================================================================================
 
-fn  char[   ]   ! test   ()
+fn  char[   ]   ? test   ()
 {
     defer (catch 
     err)
@@ -932,7 +932,7 @@ fn char[]? test()
 defer_catch_no_paren
 ================================================================================
 
-fn  char[   ]   ! test   ()
+fn  char[   ]   ? test   ()
 {
     defer catch
         io::printfn("Excuse found: %s", 
@@ -950,7 +950,7 @@ fn char[]? test()
 defer_catch_braces
 ================================================================================
 
-fn  char[   ]   ! test   ()
+fn  char[   ]   ? test   ()
 {
     defer catch 
         {io::printfn("Excuse found: %s", 
@@ -970,7 +970,7 @@ fn char[]? test()
 if_catch_return_excuse
 ================================================================================
 
-fn  char[   ]   ! test   ()
+fn  char[   ]   ? test   ()
 {
 if (catch excuse = foo(call, dab))
                 {
@@ -1023,7 +1023,7 @@ fn void? test()
 body_macro
 ================================================================================
 
-fn  char[   ]   ! test   ()
+fn  char[   ]   ? test   ()
 {
         c.@foo( a, b ; xyz , abcj ) 
         { xyz[1] =    4;};
@@ -1042,7 +1042,7 @@ fn char[]? test()
 expr_block
 ================================================================================
 
-fn  char[   ]   ! test   ()
+fn  char[   ]   ? test   ()
 {
     int foo = {| int a = 0; return a+1; |}  ! ;  
     return 0;
@@ -1061,7 +1061,7 @@ fn char[]? test()
 expr_block_bangbang
 ================================================================================
 
-fn  char[   ]   ! test   ()
+fn  char[   ]   ? test   ()
 {
     int foo = {| int a = 0; return a+1; |}  !! ;  
     return 0;
@@ -1621,7 +1621,7 @@ fn String Token.to_string(&self, Allocator allocator) @dynamic
 expr_block_standalone
 ================================================================================
 
-fn  char[   ]   ! test   ()
+fn  char[   ]   ? test   ()
 {
     {| int a = 0; return a+1; |}  ! ;  
     return 0;
@@ -1754,12 +1754,12 @@ struct_init_with_fn_pointers
 
 TestContext state @local  = {
 .foo = 1, 
-    .setup_fn = fn void!() {
+    .setup_fn = fn void?() {
         io::printn("new test setup");
         // initialize something heavy (maybe a DB)
         state.n_runs = 777;
     }, 
-    .teardown_fn = fn void!() { // inline
+    .teardown_fn = fn void?() { // inline
         state.n_runs = 0;
         io::printn("test teardown"); // inline
     },
@@ -1795,7 +1795,7 @@ TestContext state @local = {
         }, 
         .sub_field = 1
     }, 
-    .teardown_fn = fn void!() { // inline
+    .teardown_fn = fn void?() { // inline
         state.n_runs = 0;
         io::printn("test teardown"); // inline
     },
@@ -1834,7 +1834,7 @@ TestContext state @local = {
         .sub_field = 1,
         .sub_field = 2
     }, 
-    .teardown_fn = fn void!() { // inline
+    .teardown_fn = fn void?() { // inline
         state.n_runs = 0;
         io::printn("test teardown"); // inline
     },
@@ -1903,7 +1903,7 @@ fn void test_str_set_next_arg_missing_value_with_eqchar()
 expr_block_in_functions
 ================================================================================
 
-fn  char[   ]   ! test   ()
+fn  char[   ]   ? test   ()
 {
     call( {|
         io::printfn("Send %d", a);
