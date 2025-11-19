@@ -526,9 +526,11 @@ fn bool Ast.parse_interface(&ast, AstNode* node, Token* t, NodeParserState* stat
         case SCOPE:  // regular function scope { ... }
             switch (t.type) {
                 case LBRACE:  // {
-                    break;
+                    if (state.sub_node) { nextcase default; }
+                    else { break; }
                 case RBRACE:  // ending brace
-                    if (state.scope_depth == 0) nextcase STATE: state.transition(EOF);
+                    if (state.sub_node) { nextcase default; }
+                    else if (state.scope_depth == 0) { nextcase STATE: state.transition(EOF); }
                 case DOCS_START:
                     if (state.scope_depth == 2 && !state.sub_node) {
                         ast.@allc_add(AstDoc, &state.sub_node, &ast.lexer.token);
