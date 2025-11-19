@@ -658,7 +658,8 @@ fn bool Ast.parse_structural(&ast, AstNode* node, Token* t, NodeParserState* sta
         case VAR:  // found individual field start parsing it
             switch (t.type) {
                 case RBRACE:  // ending brace
-                    if (state.scope_depth == 0) nextcase STATE: state.transition(EOF);
+                    if (state.scope_depth == 0) { nextcase STATE: state.transition(EOF); }
+                    else { nextcase default; }
                 case INLINE:
                 case TYPE_IDENT:
                     AstTypeDefStructural* s = (AstTypeDefStructural*)state.sub_node;
