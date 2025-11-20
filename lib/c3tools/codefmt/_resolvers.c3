@@ -11,7 +11,7 @@ import std::collections::list;
 <*
  Decides if we need insert space before current token
 *>
-macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* t) @private
+fn bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* t) @private
 {
     usz cache_len = self.cache_statement_len();
     TokenType prev_t = cache_len > 0 ? self.__token_cache[^1].type : TokenType.INVALID_TOKEN;
@@ -307,6 +307,11 @@ macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* 
                 default:
                     nextcase TOP: default;
             }
+        case INTEGER:
+        case BOOL:
+            // integer and bool can be used as generic type parameter
+            if (prev_t == LBRACE && state.initial_token == TYPE_IDENT) { break; }
+            else { nextcase default; }
         default:
             if (self._resolve_default_space(state, t)) pre_space = true;
     }
@@ -317,7 +322,7 @@ macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* 
 <*
  Check if previous token type requires a space after it (in general case)
 *>
-macro bool CodeFmt._resolve_default_space(&self, NodeParserState* state, Token* t) @private
+fn bool CodeFmt._resolve_default_space(&self, NodeParserState* state, Token* t) @private
 {
     switch (state.last_token) {
         case QUESTION:
@@ -899,16 +904,11 @@ fn bool CodeFmt._resolve__next_question_is_error(&self, usz current_idx) @privat
 
     // Resolve by previous token.
     switch (self._resolve__prev_token(current_idx, 1)) {
-        case RETURN:
         case TYPE_IDENT:
-            return false;
-        case RBRACE:
-            if (self._resolve__prev_token(current_idx, 2) == TYPE_IDENT) return false;
+        case RVEC:
         case STAR:
-            if (self._resolve__prev_token(current_idx, 2) == RBRACE
-                && self._resolve__prev_token(current_idx, 3) == TYPE_IDENT) {
-                    return false;
-                }
+        case RBRACE:
+            return false;
         default:
             break;
     }

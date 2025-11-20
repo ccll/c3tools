@@ -259,7 +259,6 @@ fn void? main() {
     char c = call()!;
     char c = !call();
     int[<2>]? c = call();
-    List<[2]>? c = call();
     List{2}? c = call();
     if(!foo()) return 0;
     if(!foo() && (!(foo | bar) && !foo)) return 0;
@@ -283,7 +282,6 @@ fn void? main()
     char c = call()!;
     char c = !call();
     int[<2>]? c = call();
-    List <[2] >? c = call();
     List{2}? c = call();
     if (!foo()) return 0;
     if (!foo() && (!(foo | bar) && !foo)) return 0;
@@ -521,3 +519,11 @@ fn void main()
     int x = $typeof((int[?]) {1, 2, 3}).len;
     result = mem::gather(y, (bool[<2>]) {true, false}, (int[<2>]) {10, 20});
 }
+================================================================================
+my_test
+================================================================================
+List{2}? c = call();
+List{2}? c = call();
+--------------------------------------------------------------------------------
+List{2}? c = call();
+List{2}? c = call();
