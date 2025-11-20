@@ -997,6 +997,7 @@ fn bool? CodeFmt.format_docstring(CodeFmt* self, Token* t, NodeParserState* stat
                     self.newline();
                     state.transition(SCOPE);
                 case BANG:
+                case QUESTION:
                     self.write("%s", t.value);
                 case TYPE_IDENT:
                     self.write(" %s", t.value);
