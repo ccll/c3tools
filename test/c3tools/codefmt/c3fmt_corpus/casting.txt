@@ -139,7 +139,7 @@ fn void main()
     void*[] bcd = (void*[])abc;
     int[] cde = {};
     Foo[] xyz = (Foo[])cde;
-    Foo[] xyz2 = (Foo[])(int[]) { 1, 2 };
+    Foo[] xyz2 = (Foo[])(int[]){ 1, 2 };
 }
 --------------------------------------------------------------------------------
 fn void main()
@@ -148,5 +148,5 @@ fn void main()
     void*[] bcd = (void*[])abc;
     int[] cde = {};
     Foo[] xyz = (Foo[])cde;
-    Foo[] xyz2 = (Foo[])(int[]){ 1, 2 };
+    Foo[] xyz2 = (Foo[])(int[]) { 1, 2 };
 }
