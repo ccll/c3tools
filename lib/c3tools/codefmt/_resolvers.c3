@@ -221,18 +221,21 @@ macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* 
                     // empty {}
                     break;
                 default:
-                    pre_space = self._resolve__rbrace();
+                    pre_space = self._resolve__rbrace_prespace();
             }
             break;
         case LBRACE:
             switch (prev_t) {
+                case IDENT:
                 case TYPE_IDENT:
+                case CT_TYPE_IDENT:
                 case RGENPAR:
                 case RBRACE:
                 case RVEC:
                     // (List{Foo}){}.init(...)
                     break;
                 case COMMA:
+                case RPAREN:
                     pre_space = true;
                 default:
                     nextcase TOP: default;
@@ -942,18 +945,33 @@ fn isz CodeFmt.__locate_prev_token(&self, TokenType type) @private
     return -1;
 }
 
+fn isz CodeFmt.__locate_matching_lbrace(&self) @private
+{
+    isz scope_depth = 1;
+    isz idx = (isz)self.__token_cache.len();
+    while (--idx >= 0) {
+        switch (self.__token_cache[idx].type) {
+            case RBRACE: scope_depth++;
+            case LBRACE: scope_depth--;
+            default: break;
+        }
+        if (scope_depth == 0) return idx;
+    }
+    return -1;
+}
+
 <*
  Determine if a space should add before RBRACE.
 *>
-fn bool CodeFmt._resolve__rbrace(&self) @private
+fn bool CodeFmt._resolve__rbrace_prespace(&self) @private
 {
     if (self.state_stack.len() == 0) return false;
     if (self.__token_cache.len() == 0) return false;
 
-    // TODO: find the LBRACE with same nesting depth with current RBRACE.
-    isz lbrace = self.__locate_prev_token(LBRACE);
+    isz lbrace = self.__locate_matching_lbrace();
     if (lbrace == -1) return false;
 
-    // Make it symetric with lbrace.
-    return self.__token_cache[lbrace+1].type == SPACE;
+    // Make it symetric with LBRACE.
+    return self.__token_cache[lbrace+1].type == SPACE
+        && self.__token_cache[^1].type != SPACE;
 }
