@@ -217,12 +217,11 @@ macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* 
         case RBRACE:
             // array related brace
             switch (prev_t) {
-                case TYPE_IDENT:
                 case LBRACE:
                     // empty {}
                     break;
                 default:
-                    pre_space = state.scope_depth == 0;
+                    pre_space = self._resolve__rbrace();
             }
             break;
         case LBRACE:
@@ -491,7 +490,6 @@ fn bool CodeFmt._resolve__bracket_is_complex_expr(&self) @private
     return exp_count > 1;
 }
 
-// TODO: we don't need this resolver anymore, since ! is replaced by ?
 <*
  resolve  bool! c vs if(!foo)
 *>
@@ -933,4 +931,29 @@ fn bool CodeFmt._resolve__next_question_is_error(&self, usz current_idx) @privat
             break;
     }
     return true;
+}
+
+fn isz CodeFmt.__locate_prev_token(&self, TokenType type) @private
+{
+    isz idx = (isz)self.__token_cache.len();
+    while (--idx >= 0) {
+        if (self.__token_cache[idx].type == type) return idx;
+    }
+    return -1;
+}
+
+<*
+ Determine if a space should add before RBRACE.
+*>
+fn bool CodeFmt._resolve__rbrace(&self) @private
+{
+    if (self.state_stack.len() == 0) return false;
+    if (self.__token_cache.len() == 0) return false;
+
+    // TODO: find the LBRACE with same nesting depth with current RBRACE.
+    isz lbrace = self.__locate_prev_token(LBRACE);
+    if (lbrace == -1) return false;
+
+    // Make it symetric with lbrace.
+    return self.__token_cache[lbrace+1].type == SPACE;
 }
