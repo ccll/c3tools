@@ -235,6 +235,14 @@ def BenchmarkFn = fn void? (int) @if($$OLD_TEST);
 def @Align(y) = { @Align16(y / 2) };
 def @Test = { @noinline };
 ================================================================================
+optional_return_type
+================================================================================
+def TestFailFn = fn void ? (bool to_fail);
+def BenchmarkFn = fn void?(int) @if($$OLD_TEST);
+--------------------------------------------------------------------------------
+def TestFailFn = fn void? (bool to_fail);
+def BenchmarkFn = fn void? (int) @if($$OLD_TEST);
+================================================================================
 def_interface
 ================================================================================
 interface Printable @if("sasda")

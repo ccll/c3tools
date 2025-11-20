@@ -855,6 +855,22 @@ fn bool CodeFmt._resolve__prev_is_cast(&self) @private
 }
 
 <*
+ Checks previous token type in token cache
+*>
+fn TokenType CodeFmt._resolve__prev_token(&self, usz current_idx, usz nth) @private
+{
+    isz idx = (isz)current_idx;
+    usz count = 0;
+    TokenType result = INVALID_TOKEN;
+    while (--idx >= 0) {
+        result = self.__token_cache[idx].type;
+        if (result != SPACE) count++;
+        if (count >= nth) break;
+    }
+    return result;
+}
+
+<*
  Checks next token type in token cache
 *>
 fn TokenType CodeFmt._resolve__next_token(&self, usz current_idx) @private
@@ -874,9 +890,28 @@ fn bool CodeFmt._resolve__next_question_is_error(&self, usz current_idx) @privat
 {
     // Resolves ambiguity
     // foo ? bar : baz;
-    // return foo?;
-    // foo ?? ERR?!;
+    // foo ?? ERR?;
     // a = foo ? !bar : baz;
+    // List{Foo}? foo_list;
+    // List{Foo}*? foo_list_ptr;
+
+    // Resolve by previous token.
+    switch (self._resolve__prev_token(current_idx, 1)) {
+        case RETURN:
+        case TYPE_IDENT:
+            return false;
+        case RBRACE:
+            if (self._resolve__prev_token(current_idx, 2) == TYPE_IDENT) return false;
+        case STAR:
+            if (self._resolve__prev_token(current_idx, 2) == RBRACE
+                && self._resolve__prev_token(current_idx, 3) == TYPE_IDENT) {
+                    return false;
+                }
+        default:
+            break;
+    }
+
+    // Resolve by next token.
     switch (self._resolve__next_token(current_idx)) {
         case EOS:
         case RPAREN:
