@@ -667,6 +667,7 @@ fn bool CodeFmt._resolve__prev_is_binexp(&self) @private
             case RVEC:
             case LGENPAR:
             case RGENPAR:
+            case LBRACE:
             case RBRACE:
                 has_brackets = true;
             case BIT_AND_ASSIGN:
