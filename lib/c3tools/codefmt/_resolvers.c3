@@ -114,6 +114,8 @@ macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* 
             switch (prev_t) {
                 case AMP:  // likely &Type.foo
                     if (self._resolve__prev_is_binexp()) pre_space = true;
+                case LBRACE:
+                    break;
                 default:
                     nextcase TOP: default;
             }
