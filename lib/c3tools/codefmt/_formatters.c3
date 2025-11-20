@@ -221,6 +221,7 @@ fn bool? CodeFmt.format_global_file_scope(CodeFmt* self, Token* t, NodeParserSta
     return false;
 }
 
+
 <*
  Callable code formatter (fn/macros)
 
@@ -254,6 +255,14 @@ fn bool? CodeFmt.format_fn(CodeFmt* self, Token* t, NodeParserState* state) @pri
                     if (state.scope_depth == 0) self.write(" ");
                     nextcase default;
                 case LPAREN:
+                    // Add space before '('.
+                    switch (state.last_token) {
+                        case IDENT:
+                        case AT_IDENT:
+                            break;
+                        default:
+                            self.write(" ");
+                    }
                     nextcase STATE: state.transition(VAR);
                 default:
                     self.write("%s", t.value);
@@ -275,7 +284,14 @@ fn bool? CodeFmt.format_fn(CodeFmt* self, Token* t, NodeParserState* state) @pri
                 case IMPLIES:  // =>
                     nextcase STATE: state.transition(IMPLIES);
                 case EOS:
-                    self.write(";");
+                    if (self.state_stack.len() <= 1) {
+                        self.write(";");
+                        return true;
+                    }
+                    TokenType parent_t = self.state_stack[^2].state.initial_token;
+                    if (parent_t == INTERFACE || parent_t == EXTERN || parent_t == INVALID_TOKEN) {
+                        self.write(";");
+                    }
                     return true;
                 default:
                     self.@fail(t, "unexpected token in funcion args")!;
@@ -294,7 +310,14 @@ fn bool? CodeFmt.format_fn(CodeFmt* self, Token* t, NodeParserState* state) @pri
                 case LBRACE:  // {
                     if (state.scope_depth == 1) nextcase STATE: state.transition(SCOPE);
                 case EOS:
-                    self.write(";");
+                    if (self.state_stack.len() <= 1) {
+                        self.write(";");
+                        return true;
+                    }
+                    TokenType parent_t = self.state_stack[^2].state.initial_token;
+                    if (parent_t == INTERFACE || parent_t == EXTERN || parent_t == INVALID_TOKEN) {
+                        self.write(";");
+                    }
                     return true;
                 default:
                     self.@fail(t, "unexpected token in funcion attributes")!;
@@ -526,8 +549,21 @@ fn bool? CodeFmt.format_generic_statement(CodeFmt* self, Token* t, NodeParserSta
                         self.newline();
                     }
                     nextcase default;
-                case DO:
                 case FN:
+                    if (state.last_token == EQ && state.prev_scope(1) == LBRACE) {
+                        // = {.my_func = fn void () ...}
+                        self.cache_statement_dump_struct_init(
+                            is_multiline: true, wrap_rule: COMMA
+                        )!;
+                        state.initial_token = STRUCT;
+                        self.write(" %s ", t.value);
+                        break;
+                    } else {
+                        self.cache_statement_dump()!;
+                        self.write(" ");
+                        return self.push_run_state(&CodeFmt.format_fn, t);
+                    }
+                case DO:
                     if (state.last_token == EQ && state.prev_scope(1) == LBRACE) {
                         // = {.my_func = fn void () ...}
                         self.cache_statement_dump_struct_init(

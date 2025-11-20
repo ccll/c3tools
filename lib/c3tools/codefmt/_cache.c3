@@ -11,7 +11,7 @@ import std::collections::list;
 <*
  Dumps and formats collected cache_statement_ array into code
 *>
-macro void? CodeFmt.cache_statement_dump(
+fn void? CodeFmt.cache_statement_dump(
     &self, TokenType wrap_rule = INVALID_TOKEN, bool no_split = false
 ) @private
 {
@@ -322,7 +322,7 @@ macro void? CodeFmt.cache_statement_dump_generic(&self, bool is_multiline, Token
 <*
  Adds a token to composite statement cache for further formatting.
 *>
-macro void CodeFmt.cache_statement_add(&self, NodeParserState* state, Token* t) @private
+fn void CodeFmt.cache_statement_add(&self, NodeParserState* state, Token* t) @private
 {
     assert(t.type != EMPTY_LINE);
     assert(t.type != SPACE);
