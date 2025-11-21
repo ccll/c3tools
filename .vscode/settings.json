@@ -1,7 +1,0 @@
-{
-    "[c][cpp][c3]": {
-        "editor.defaultFormatter": null,
-        "editor.formatOnSave": false
-    },
-    "c3.lsp.enable": false
-}
