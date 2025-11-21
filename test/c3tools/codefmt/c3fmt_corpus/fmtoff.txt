@@ -108,7 +108,7 @@ fn void main()
 ================================================================================
 fmt_off_inside_struct_initializer
 ================================================================================
-fn void! command_compile(Config* config, ArgParse* agp)
+fn void? command_compile(Config* config, ArgParse* agp)
 {
     // fmt: off
     ArgParse sub_args = {
@@ -124,7 +124,7 @@ fn void! command_compile(Config* config, ArgParse* agp)
     // fmt: on
 }
 --------------------------------------------------------------------------------
-fn void! command_compile(Config* config, ArgParse* agp)
+fn void? command_compile(Config* config, ArgParse* agp)
 {
     // fmt: off
     ArgParse sub_args = {
@@ -142,7 +142,7 @@ fn void! command_compile(Config* config, ArgParse* agp)
 ================================================================================
 fmt_off_inside_long_array
 ================================================================================
-fn void! command_compile(Config* config, ArgParse* agp)
+fn void? command_compile(Config* config, ArgParse* agp)
 {
     // fmt: off
     const Base64Alphabet STANDARD = {
@@ -153,7 +153,7 @@ fn void! command_compile(Config* config, ArgParse* agp)
     // fmt: on
 }
 --------------------------------------------------------------------------------
-fn void! command_compile(Config* config, ArgParse* agp)
+fn void? command_compile(Config* config, ArgParse* agp)
 {
     // fmt: off
     const Base64Alphabet STANDARD = {

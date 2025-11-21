@@ -7,7 +7,7 @@ import c3tools::codefmt;
 
 fn void test_two_spaces()
 {
-    CodeFmt fmt = CodeFmt.new_init(indent_type: '2');
+    CodeFmt fmt = codefmt::new_init(indent_type: '2');
     defer fmt.free();
     String input = `
 fn void main() 
@@ -33,7 +33,7 @@ fn void main()
 
 fn void test_eight_spaces()
 {
-    CodeFmt fmt = CodeFmt.new_init(indent_type: '8');
+    CodeFmt fmt = codefmt::new_init(indent_type: '8');
     defer fmt.free();
     String input = `
 fn void main() 
@@ -59,7 +59,7 @@ fn void main()
 
 fn void test_tabs()
 {
-    CodeFmt fmt = CodeFmt.new_init(indent_type: 't');
+    CodeFmt fmt = codefmt::new_init(indent_type: 't');
     defer fmt.free();
     String input = `
 fn void main() 

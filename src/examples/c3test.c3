@@ -16,7 +16,7 @@ struct Config
     }
 }
 
-fn void! command_compile(Config* config, ArgParse* agp)
+fn void? command_compile(Config* config, ArgParse* agp)
 {
     assert(agp.arguments[0] == "compile");
 
@@ -72,7 +72,7 @@ fn int main(String[] args)
                 .short_name = 'O',
                 .value = &config,
                 .help = "optimization level [default: O0]",
-                .callback = fn void! (ArgOpt* opt, String value) {
+                .callback = fn void? (ArgOpt* opt, String value) {
                     Config* ctx = anycast(opt.value, Config)!;
                     int level = value.to_integer(int)!;
                     io::printfn("optimization level arg callback: -O%s", value);

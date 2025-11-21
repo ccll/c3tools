@@ -81,7 +81,7 @@ fn int main(String[] args)
     return 0;
 }
 
-fn void! find(FzfSettings* settings) @local
+fn void? find(FzfSettings* settings) @local
 {
     if (settings.preview && settings.module_filter == ".") {
         io::printfn("You must pass full module name in a module filter argument, got .");
@@ -96,7 +96,7 @@ fn void! find(FzfSettings* settings) @local
     settings.project_path = proj_abs.str_view();
     defer proj_abs.free();
     
-    Path! std_abs = path::temp_new(settings.stdlib_path).new_absolute();
+    Path? std_abs = path::temp_new(settings.stdlib_path).new_absolute();
     defer {
         if(try std_abs) std_abs.free();
     }
@@ -105,7 +105,7 @@ fn void! find(FzfSettings* settings) @local
         settings.stdlib_path = std_abs.str_view();
     }
     
-    LspProject proj = LspProject.new_init(settings.project_path, settings.stdlib_path);
+    LspProject proj = project::new_lsp_project(settings.project_path, settings.stdlib_path);
     defer proj.free();
 
     if (catch err = proj.load()) {
@@ -119,7 +119,7 @@ fn void! find(FzfSettings* settings) @local
         return print_modules_list(settings, &proj);
     }
 
-    List(<ModuleDecl>) declarations;
+    List{ModuleDecl} declarations;
     declarations.temp_init(proj.modules.items_len);
 
     foreach (&sym : proj.modules.iter_items()) {
@@ -188,9 +188,9 @@ fn int cmp_str(String a, String b)
     return (int)(an - bn);
 }
 
-fn void! print_modules_list(FzfSettings* settings, LspProject* proj) @local
+fn void? print_modules_list(FzfSettings* settings, LspProject* proj) @local
 {
-    List(<String>) modules;
+    List{String} modules;
     modules.new_init(proj.modules.len());
     defer modules.free();
 
@@ -278,7 +278,7 @@ fn void print_decl_struct(AstTypeDefStructural* d, bool is_full_preview, uint in
         print_docs(d.docs);
     }
 
-    DString idt = dstring::temp_new();
+    DString idt = dstring::temp();
     for (uint i = 0; i < indent; i++) {
         idt.append(" ");
     }
@@ -396,8 +396,8 @@ fn String strip_path(FzfSettings* settings, String path) {
     return result;
 }
 
-fn void! print_preview(
-    FzfSettings* settings, LspProject* proj, List(<ModuleDecl>) declarations, bool is_full_preview
+fn void? print_preview(
+    FzfSettings* settings, LspProject* proj, List{ModuleDecl} declarations, bool is_full_preview
 ) @local
 {
 

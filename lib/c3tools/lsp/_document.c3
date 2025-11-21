@@ -34,14 +34,14 @@ struct DocumentContext {
 }
 
 
-fn Document Document.new_open(String uri, String full_source, LspProject* proj) @operator(construct)
+fn Document new_document(String uri, String full_source, LspProject* proj)
 {
     Document self = {
         .proj = proj,
     };
 
     // TODO: estimate average source size
-    self._allocator.init(1024, allocator::heap());
+    self._allocator.init(mem, 1024);
 
     // Allocate AST first, it will fill the arena with local metadata
     self.ast = ast::parse(full_source, file_path: uri, allc: &self._allocator);
@@ -50,20 +50,20 @@ fn Document Document.new_open(String uri, String full_source, LspProject* proj) 
     self.uri = uri.copy(&self._allocator);
 
     // NOTE: source is allocated in heap, not in arena + add extra space for editing
-    self.source.new_init(capacity: full_source.len * 2, allocator: allocator::heap());
+    self.source.init(allocator: mem, capacity: full_source.len * 2);
     self.source.append(full_source);
 
     return self;
 }
 
-fn void! Document.save(&self, String full_sourse)
+fn void? Document.save(&self, String full_sourse)
 {
     // update full document structure?
     // trigger LspProject* document decls updates?
 
 }
 
-fn void! Document.change(&self, List(<DocChange>) changes)
+fn void? Document.change(&self, List{DocChange} changes)
 {
     // update document scope structure
 

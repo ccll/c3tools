@@ -4,3 +4,6 @@ scripts/c3fmt_gentests
 test/c3tools/codefmt/test_c3fmt_corpus.c3
 # exclude c3c/ used in CI/CD
 c3c/
+*.exe
+*.lib
+*.pdb

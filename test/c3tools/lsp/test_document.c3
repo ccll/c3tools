@@ -11,7 +11,7 @@ fn Position resolve_src_pos(DString src) @private
     int col = -1;
 
     @pool() {
-        DString tmp = dstring::temp_new();
+        DString tmp = dstring::temp();
         foreach (c : src) {
             if (c == '\n') {
                 line++;
@@ -29,7 +29,7 @@ fn Position resolve_src_pos(DString src) @private
         src.append(tmp);
     };
     assert(lpos >= 0 && cpos >= 0, "| cursor place was not found");
-    return Position { .l = lpos, .c = cpos };
+    return (Position) { .l = lpos, .c = cpos };
 }
 
 module test::c3tools::lsp::document @test;
@@ -62,10 +62,10 @@ fn void test_init_lsp_proj()
 {
     test::@setup(state.setup_fn, state.teardown_fn);
     String uri = "file://" +++ BASE_PROJ_PATH +++ "mod1.c3";
-    String src = (String)file::load_new(BASE_PROJ_PATH +++ "mod1.c3")!!;
-    defer src.free();
+    String src = (String)file::load(mem, BASE_PROJ_PATH +++ "mod1.c3")!!;
+    defer src.free(mem);
 
-    Document doc = Document.new_open(uri, src, &state.lsp.proj);
+    Document doc = lsp::new_document(uri, src, &state.lsp.proj);
     defer doc.close();
 
     test::eq(uri, doc.uri);
@@ -79,6 +79,7 @@ fn void test_document_cursor()
     test::@setup(state.setup_fn, state.teardown_fn);
 
     DString src = dstring::new(
+        mem,
         `
 m|odule test::c3tools::lsp_test_mod1;
 int global_int @local = 2;
@@ -95,7 +96,7 @@ fn int add(int a, int b) {
     test::eq(cur.l, 0);
     test::eq(cur.c, 1);
 
-    Document doc = Document.new_open("file://test.c3", src.str_view(), &state.lsp.proj);
+    Document doc = lsp::new_document("file://test.c3", src.str_view(), &state.lsp.proj);
     defer doc.close();
 
     test::eq(doc.ast.@node_len(doc.ast.modules), 1);
@@ -107,6 +108,7 @@ fn void test_document_cursor_next_line()
     test::@setup(state.setup_fn, state.teardown_fn);
 
     DString src = dstring::new(
+        mem,
         `
 module test::c3tools::lsp_test_mod1;
 int g|lobal_int @local = 2;
@@ -129,6 +131,7 @@ fn void test_document_context()
     test::@setup(state.setup_fn, state.teardown_fn);
 
     DString src = dstring::new(
+        mem,
         `
 m|odule test::c3tools::lsp_test_mod1;
 int global_int @local = 2;
@@ -140,7 +143,7 @@ fn int add(int a, int b) {
     defer src.free();
 
     Position cur = resolve_src_pos(src);
-    Document doc = Document.new_open("file://test.c3", src.str_view(), &state.lsp.proj);
+    Document doc = lsp::new_document("file://test.c3", src.str_view(), &state.lsp.proj);
     defer doc.close();
 
 }

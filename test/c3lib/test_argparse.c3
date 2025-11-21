@@ -60,7 +60,7 @@ fn void test_help_show()
     };
 
     String[] args = { "testprog", "-h" };
-    test::@error(agp.parse(args), ArgError.HELP_SHOW);
+    test::@error(agp.parse(args), argparse::HELP_SHOW);
 }
 
 fn void test_help_show_long()
@@ -76,7 +76,7 @@ fn void test_help_show_long()
     };
 
     String[] args = { "testprog", "--help" };
-    test::@error(agp.parse(args), ArgError.HELP_SHOW);
+    test::@error(agp.parse(args), argparse::HELP_SHOW);
 }
 
 fn void test_bool_flag()
@@ -270,7 +270,7 @@ fn void test_invalid_arg_short()
     };
 
     String[] args = { "testprog", "-z" };
-    test::@error(agp.parse(args), ArgError.INVALID_ARGUMENT);
+    test::@error(agp.parse(args), argparse::INVALID_ARGUMENT);
 }
 
 fn void test_invalid_arg_long()
@@ -289,7 +289,7 @@ fn void test_invalid_arg_long()
     };
 
     String[] args = { "testprog", "--zooo" };
-    test::@error(agp.parse(args), ArgError.INVALID_ARGUMENT);
+    test::@error(agp.parse(args), argparse::INVALID_ARGUMENT);
 }
 
 fn void test_missing_require_argument()
@@ -309,7 +309,7 @@ fn void test_missing_require_argument()
     };
 
     String[] args = { "testprog" };
-    test::@error(agp.parse(args), ArgError.MISSING_ARGUMENT);
+    test::@error(agp.parse(args), argparse::MISSING_ARGUMENT);
 }
 
 fn void test_missing_require_arguments_many()
@@ -336,7 +336,7 @@ fn void test_missing_require_arguments_many()
     };
 
     String[] args = { "testprog" };
-    test::@error(agp.parse(args), ArgError.MISSING_ARGUMENT);
+    test::@error(agp.parse(args), argparse::MISSING_ARGUMENT);
 }
 
 fn void test_passing_short_option_after_argument()
@@ -355,7 +355,7 @@ fn void test_passing_short_option_after_argument()
     };
 
     String[] args = { "testprog", "foo", "-f" };
-    test::@error(agp.parse(args), ArgError.INVALID_ARGUMENT);
+    test::@error(agp.parse(args), argparse::INVALID_ARGUMENT);
 }
 
 fn void test_passing_long_option_after_argument()
@@ -374,7 +374,7 @@ fn void test_passing_long_option_after_argument()
     };
 
     String[] args = { "testprog", "foo", "--flt" };
-    test::@error(agp.parse(args), ArgError.INVALID_ARGUMENT);
+    test::@error(agp.parse(args), argparse::INVALID_ARGUMENT);
 }
 
 fn void test_multiple_short_args()
@@ -423,7 +423,7 @@ fn void test_str_set_next_arg_missing_value_with_eqchar()
     };
 
     String[] args = { "testprog", "--flt=" };
-    test::@error(agp.parse(args), ArgError.ARGUMENT_VALUE);
+    test::@error(agp.parse(args), argparse::ARGUMENT_VALUE);
 }
 
 fn void test_str_set_next_arg_missing_value()
@@ -442,7 +442,7 @@ fn void test_str_set_next_arg_missing_value()
     };
 
     String[] args = { "testprog", "--flt" };
-    test::@error(agp.parse(args), ArgError.ARGUMENT_VALUE);
+    test::@error(agp.parse(args), argparse::ARGUMENT_VALUE);
 }
 
 fn void test_str_set_next_arg_is_another_option()
@@ -466,7 +466,7 @@ fn void test_str_set_next_arg_is_another_option()
     };
 
     String[] args = { "testprog", "--flt", "-a" };
-    test::@error(agp.parse(args), ArgError.ARGUMENT_VALUE);
+    test::@error(agp.parse(args), argparse::ARGUMENT_VALUE);
 }
 
 fn void test_str_set_next_arg_is_another_option_long()
@@ -490,7 +490,7 @@ fn void test_str_set_next_arg_is_another_option_long()
     };
 
     String[] args = { "testprog", "--flt", "--all" };
-    test::@error(agp.parse(args), ArgError.ARGUMENT_VALUE);
+    test::@error(agp.parse(args), argparse::ARGUMENT_VALUE);
 }
 
 fn void test_duplicated_flag()
@@ -505,7 +505,7 @@ fn void test_duplicated_flag()
     };
 
     String[] args = { "testprog", "--all", "--all" };
-    test::@error(agp.parse(args), ArgError.INVALID_ARGUMENT);
+    test::@error(agp.parse(args), argparse::INVALID_ARGUMENT);
 }
 
 fn void test_integer_option_i32()
@@ -542,7 +542,7 @@ fn void test_integer_option_parsing_error()
     };
 
     String[] args = { "testprog", "--int=a" };
-    test::@error(agp.parse(args), ArgError.ARGUMENT_VALUE);
+    test::@error(agp.parse(args), argparse::ARGUMENT_VALUE);
 }
 
 fn void test_integer_option_parsing_error_short()
@@ -561,7 +561,7 @@ fn void test_integer_option_parsing_error_short()
     };
 
     String[] args = { "testprog", "-i", "a" };
-    test::@error(agp.parse(args), ArgError.ARGUMENT_VALUE);
+    test::@error(agp.parse(args), argparse::ARGUMENT_VALUE);
 }
 
 fn void test_integer_option_u32()
@@ -718,7 +718,7 @@ fn void test_empty_argument()
     };
 
     String[] args = { "testprog", "" };
-    test::@error(agp.parse(args), ArgError.INVALID_ARGUMENT);
+    test::@error(agp.parse(args), argparse::INVALID_ARGUMENT);
 }
 
 fn void test_multi_arguments_double_dash()
@@ -871,7 +871,7 @@ fn void test_custom_type_callback_unknown_type()
 {
 
     char val = '\0';
-    ArgParseCallbackFn cbf = fn void! (ArgOpt* opt, String value) {
+    ArgParseCallbackFn cbf = fn void? (ArgOpt* opt, String value) {
         io::printfn("flt--callback");
         test::eq(value, "bar");
         *anycast(opt.value, char)! = value[0];
@@ -891,7 +891,7 @@ fn void test_custom_type_callback_unknown_type()
                 .short_name = 'o',
                 .long_name = "other",
                 .value = &my_app_state,
-                .callback = fn void! (ArgOpt* opt, String value) {
+                .callback = fn void? (ArgOpt* opt, String value) {
                     ArgParse* ctx = anycast(opt.value, ArgParse)!;
                     io::printfn("other--callback");
                     // NOTE: pretends to update important app struct
@@ -916,7 +916,7 @@ fn void test_custom_type_callback_str_type()
 {
 
     String val = "foo";
-    ArgParseCallbackFn cbf = fn void! (ArgOpt* opt, String value) {
+    ArgParseCallbackFn cbf = fn void? (ArgOpt* opt, String value) {
         *anycast(opt.value, String)! = value[0..1];
     };
 
@@ -941,7 +941,7 @@ fn void test_custom_type_callback_str_type_bad_arg()
 {
 
     String val = "foo";
-    ArgParseCallbackFn cbf = fn void! (ArgOpt* opt, String value) {
+    ArgParseCallbackFn cbf = fn void? (ArgOpt* opt, String value) {
         *anycast(opt.value, String)! = value[0..1];
     };
 
@@ -953,14 +953,14 @@ fn void test_custom_type_callback_str_type_bad_arg()
     };
 
     String[] args = { "testprog", "--flt=" };
-    test::@error(agp.parse(args), ArgError.ARGUMENT_VALUE);
+    test::@error(agp.parse(args), argparse::ARGUMENT_VALUE);
 }
 
 fn void test_custom_type_callback_bool()
 {
 
     bool val = false;
-    ArgParseCallbackFn cbf = fn void! (ArgOpt* opt, String value) {
+    ArgParseCallbackFn cbf = fn void? (ArgOpt* opt, String value) {
         test::eq(value, "1");
         if (value == "1") {
             *anycast(opt.value, bool)! = true;
@@ -987,7 +987,7 @@ fn void test_custom_type_callback_bool_unset()
 {
 
     bool val = true;
-    ArgParseCallbackFn cbf = fn void! (ArgOpt* opt, String value) {
+    ArgParseCallbackFn cbf = fn void? (ArgOpt* opt, String value) {
         test::eq(value, "0");
         if (value == "1") {
             *anycast(opt.value, bool)! = true;
@@ -1029,7 +1029,7 @@ fn void test_bool_flag_unset_no_short()
     test::eq(val, true);
     test::eq(agp.options[0]._is_present, false);
 
-    test::@error(agp.parse(args), ArgError.INVALID_ARGUMENT);
+    test::@error(agp.parse(args), argparse::INVALID_ARGUMENT);
 }
 
 fn void test_bool_flag_unset_has_arg()
@@ -1089,8 +1089,8 @@ fn void test_short_arguments()
 fn void test_custom_type_callback_int_array()
 {
 
-    List(<int>) numbers;
-    numbers.new_init(); 
+    List{int} numbers;
+    numbers.init(mem); 
     defer numbers.free();
 
     argparse::ArgParse agp = {
@@ -1100,9 +1100,9 @@ fn void test_custom_type_callback_int_array()
                 .long_name = "num",
                 .value = &numbers,
                 .allow_many = true,
-                .callback = fn void! (ArgOpt* opt, String value) {
+                .callback = fn void? (ArgOpt* opt, String value) {
                     io::printfn("value: %s", value);
-                    List(<int>) * ctx = anycast(opt.value, List(<int>))!;
+                    List{int} * ctx = anycast(opt.value, List{int})!;
                     int val = value.to_integer(int)!;
                     ctx.push(val);
                 }
@@ -1127,8 +1127,8 @@ fn void test_custom_type_callback_int_array()
 fn void test_custom_type_callback_without_allowing_many()
 {
 
-    List(<int>) numbers;
-    numbers.new_init(); 
+    List{int} numbers;
+    numbers.init(mem); 
     defer numbers.free();
 
     argparse::ArgParse agp = {
@@ -1137,9 +1137,9 @@ fn void test_custom_type_callback_without_allowing_many()
                 .short_name = 'n',
                 .long_name = "num",
                 .value = &numbers,
-                .callback = fn void! (ArgOpt* opt, String value) {
+                .callback = fn void? (ArgOpt* opt, String value) {
                     io::printfn("value: %s", value);
-                    List(<int>) * ctx = anycast(opt.value, List(<int>))!;
+                    List{int} * ctx = anycast(opt.value, List{int})!;
                     int val = value.to_integer(int)!;
                     ctx.push(val);
                 }
@@ -1151,14 +1151,14 @@ fn void test_custom_type_callback_without_allowing_many()
     test::eq(numbers.len(), 0);
     test::eq(agp.options[0]._is_present, false);
 
-    test::@error(agp.parse(args), ArgError.INVALID_ARGUMENT);
+    test::@error(agp.parse(args), argparse::INVALID_ARGUMENT);
 }
 
 fn void test_argparse_next_no_args()
 {
 
-    List(<String>) args;
-    args.new_init(); 
+    List{String} args;
+    args.init(mem); 
     defer args.free();
 
     argparse::ArgParse agp;
@@ -1177,8 +1177,8 @@ fn void test_argparse_next_no_args()
 fn void test_argparse_next_short_arg()
 {
 
-    List(<String>) args;
-    args.new_init(); 
+    List{String} args;
+    args.init(mem); 
     defer args.free();
 
     argparse::ArgParse agp;
@@ -1198,8 +1198,8 @@ fn void test_argparse_next_short_arg()
 fn void test_argparse_next_short_and_long_arg()
 {
 
-    List(<String>) args;
-    args.new_init(); 
+    List{String} args;
+    args.init(mem); 
     defer args.free();
 
     argparse::ArgParse agp;
@@ -1221,8 +1221,8 @@ fn void test_argparse_next_short_and_long_arg()
 fn void test_argparse_next_short_and_long_arg_eq()
 {
 
-    List(<String>) args;
-    args.new_init(); 
+    List{String} args;
+    args.init(mem); 
     defer args.free();
 
     argparse::ArgParse agp;
@@ -1246,7 +1246,7 @@ fn void test_argparse_next_empty_value()
     argparse::ArgParse agp;
 
     String[] argv = { "testprog", ""};
-    test::@error(agp.next(argv), ArgError.INVALID_ARGUMENT);
+    test::@error(agp.next(argv), argparse::INVALID_ARGUMENT);
 }
 
 fn void test_argparse_next__empty_eq()
@@ -1254,14 +1254,14 @@ fn void test_argparse_next__empty_eq()
     argparse::ArgParse agp;
 
     String[] argv = { "testprog", "--fofo="};
-    test::@error(agp.next(argv), ArgError.INVALID_ARGUMENT);
+    test::@error(agp.next(argv), argparse::INVALID_ARGUMENT);
 }
 
 fn void test_argparse_next_all_together()
 {
 
-    List(<String>) args;
-    args.new_init(); 
+    List{String} args;
+    args.init(mem); 
     defer args.free();
 
 
@@ -1288,8 +1288,8 @@ fn void test_argparse_next_all_together()
 fn void test_argparse_next_usage()
 {
 
-    List(<String>) args;
-    args.new_init(); 
+    List{String} args;
+    args.init(mem); 
     defer args.free();
 
 
@@ -1321,8 +1321,8 @@ fn void test_argparse_next_usage()
 fn void test_argparse_next_switch()
 {
 
-    List(<String>) args;
-    args.new_init(); 
+    List{String} args;
+    args.init(mem); 
     defer args.free();
 
     ArgParse agp = {
@@ -1400,7 +1400,7 @@ fn void test_number_accumulator_with_callback()
                 .long_name = "num",
                 .value = &accum,
                 .allow_many = true,
-                .callback = fn void! (ArgOpt* opt, String value) {
+                .callback = fn void? (ArgOpt* opt, String value) {
                     io::printfn("value: %s", value);
                     int * val = anycast(opt.value, int)!;
                     if (!opt._is_present) {

@@ -4,28 +4,28 @@ import std::collections::list;
 import c3lib::codegen;
 import c3tools::codefmt::codecorpus @public;
 
-fn void! load_corpus(CodeGen* code, String path) @local
+fn void? load_corpus(CodeGen* code, String path) @local
 {
     assert(path);
 
-    path::Path p = path::temp_new(path)!;
+    path::Path p = path::temp(path)!;
     io::printfn("Processing path: %s", p.str_view());
 
     if (!path::exists(p)) {
-        return IoError.FILE_NOT_FOUND?;
+        return io::FILE_NOT_FOUND?;
     }
     if (!path::is_dir(p)) {
-        return IoError.FILE_NOT_DIR?;
+        return io::FILE_NOT_DIR?;
     }
 
-    path::PathWalker fnwalk = fn bool! (Path p, bool is_dir, void* ctx) {
+    path::PathWalker fnwalk = fn bool? (Path p, bool is_dir, void* ctx) {
         CodeGen* code = ctx;
 
         if (is_dir) return false;
         if (!p.has_extension("txt")) return false;
 
         io::printfn("Parsing corpus: %s", p.str_view());
-        List(<CodeCorpus>)! corpus = codecorpus::new_parse(p.str_view());
+        List{CodeCorpus}? corpus = codecorpus::new_parse(p.str_view());
         defer (void)corpus.free();
 
         if (catch err = corpus) {
@@ -39,7 +39,7 @@ fn void! load_corpus(CodeGen* code, String path) @local
 
         foreach (c : corpus) {
             code.@fn("void test_corpus__%s__%s()", file_part, c.case_name) {
-                code.wn("CodeFmt fmt = CodeFmt.new_init()");
+                code.wn("CodeFmt fmt = codefmt::new_init()");
                 code.wn("defer fmt.free()");
                 // NOTE: adding \n to input + input[1..] when check for visual formatting reasons
                 code.wn("String input = `\n%s`", c.case_input);
@@ -53,8 +53,8 @@ fn void! load_corpus(CodeGen* code, String path) @local
                 code.wn(
                     "test::@check(codecorpus::compare_output(expected[1..], formatted), `format mismatch`)"
                 );
-                code.wn("String fmt_out = formatted.copy()");
-                code.wn("defer fmt_out.free()");
+                code.wn("String fmt_out = formatted.copy(mem)");
+                code.wn("defer fmt_out.free(mem)");
                 code.wn("formatted = fmt.format(fmt_out, print_lex: false)!!");
                 code.wn("assert(fmt_out.ptr != formatted.ptr)");
                 code.@if("expected[1..] != formatted") {
@@ -79,7 +79,8 @@ fn void! load_corpus(CodeGen* code, String path) @local
 
 fn int main(String[] args)
 {
-    CodeGen* code = CodeGen {}.new_init();
+    CodeGen code;
+    code.init();
     defer code.free();
 
     code.@module("test::c3tools::c3fmt_corpus @test");
@@ -87,13 +88,13 @@ fn int main(String[] args)
     code.@import("c3tools::codefmt::codecorpus @public");
     code.@import("std::io");
 
-    Path p = path::temp_cwd()!!;
+    Path p = path::tcwd()!!;
     io::printfn("cwd: %s", p.str_view());
 
     String cwd = "../test/c3tools/codefmt/c3fmt_corpus";
     String out_file = "../test/c3tools/codefmt/test_c3fmt_corpus.c3";
 
-    if (catch err = load_corpus(code, cwd)) {
+    if (catch err = load_corpus(&code, cwd)) {
         return 1;
     }
 

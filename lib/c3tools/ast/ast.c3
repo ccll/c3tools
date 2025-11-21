@@ -13,10 +13,10 @@ struct Ast
     AstModule* modules;
     allocator::DynamicArenaAllocator* _allocator;
     Lexer lexer;
-    List(<NodeParserState>) state_stack;
+    List{NodeParserState} state_stack;
 }
 
-def NodeParser = fn bool (Ast* ast, AstNode* node, Token* t, NodeParserState* state);
+alias NodeParser = fn bool (Ast* ast, AstNode* node, Token* t, NodeParserState* state);
 
 struct NodeParserState
 {
@@ -27,6 +27,12 @@ struct NodeParserState
     AstNode* sub_node;
     uint scope_depth;
     TokenType[32] scope_stack;
+
+    // HACK: The new generics syntax List{int} brings some trouble in format_generic_statement().
+    // Now braces can appear in 'for/while' loop expressions, 'fn' return type and parameters,
+    // before the code scope braces.
+    // We track the initial token depth to resolve the ambiguity.
+    uint initial_token_depth;
 }
 
 struct AstNode
@@ -212,7 +218,7 @@ fn Ast parse(
     if (allc == null) {
         // typically this will be actual only for tests
         self._allocator = mem::alloc(DynamicArenaAllocator);
-        self._allocator.init(1024, allocator::temp());
+        self._allocator.init(tmem, 1024);
     } else {
         self._allocator = allc;
     }
@@ -229,7 +235,7 @@ fn Ast parse(
     );
     current_module.file_path = self.path;
 
-    self.state_stack.new_init();
+    self.state_stack.init(mem);
     defer self.state_stack.free();
 
     while LOOP: (self.lexer.next_token()) {
@@ -304,7 +310,7 @@ fn Ast parse(
             }
 
             assert(self.state_stack.len() == 0);
-            self.state_stack.push(NodeParserState {});
+            self.state_stack.push({});
         }
 
         if (node_fn(&self, node, &self.lexer.token, &self.state_stack[0])) {
@@ -312,7 +318,7 @@ fn Ast parse(
             switch (node.type) {
                 case MODULE:
                     assert(node == current_module);
-                    DString mname = dstring::temp_new();
+                    DString mname = dstring::temp();
                     node.value = self.@allc_str(self.@node_join(current_module.name, mname, "::"));
                     current_module.hash.init();
                     current_module.hash.update(node.value);

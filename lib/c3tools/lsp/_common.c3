@@ -17,7 +17,7 @@ enum SymbolKind
     ENUM,  // MyEnum.BAR / MyFault.ANOTHER
     STRUCT,  // struct Name
     TYPE, // custom TypeName
-    GENERIC, // generic type List(<int>)
+    GENERIC, // generic type List{int}
     ARRAY,  // array or List or other collection of items
     BUILTIN, // represents builtin type/func/const/keyword
 }

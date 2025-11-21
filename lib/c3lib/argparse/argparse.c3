@@ -144,8 +144,8 @@ different types.
 Example of parsing array of numbers:
 ```c3
 
-List(<int>) numbers;
-numbers.new_init(); 
+List{int} numbers;
+numbers.init(mem); 
 defer numbers.free();
 
 ArgParse agp = {
@@ -155,8 +155,8 @@ ArgParse agp = {
             .long_name = "num",
             .value = &numbers,
             .allow_many = true,
-            .callback = fn void! (ArgOpt* opt, String value) {
-                List(<int>) * ctx = anycast(opt.value, List(<int>))!;
+            .callback = fn void? (ArgOpt* opt, String value) {
+                List{int} * ctx = anycast(opt.value, List{int})!;
                 int val = value.to_integer(int)!;
                 ctx.push(val);
             }
@@ -168,19 +168,19 @@ ArgParse agp = {
 param opt "ArgOpt related to option parsed"
 param value "raw string value from command line argv"
 *>
-def ArgParseCallbackFn = fn void! (ArgOpt* opt, String value);
+alias ArgParseCallbackFn = fn void? (ArgOpt* opt, String value);
 
 <*
 Special template option for --help/-h - prints usage
 *>
 macro help_opt(String help_prompt = "show this help message and exit")
 {
-    return ArgOpt {
+    return (ArgOpt) {
         ._arg_type = ArgType.HELP,
         .short_name = 'h',
         .long_name = "help",
         .help = help_prompt,
-        .value = any_make(null,bool.typeid),
+        .value = any_make(null,bool.typeid)
     };
 }
 
@@ -189,10 +189,7 @@ Section separator in usage printout
 *>
 macro group_opt(String group_name)
 {
-    return ArgOpt {
-        ._arg_type = ArgType.GROUP,
-        .help = group_name,
-    };
+    return (ArgOpt){._arg_type = ArgType.GROUP, .help = group_name };
 }
 
 <*
@@ -207,8 +204,8 @@ Example:
 ```c3
 fn void test_argparse_next_all_together()
 {
-    List(<String>) args;
-    args.new_init(); 
+    List{String} args;
+    args.init(mem); 
     defer args.free();
 
     String[] argv = { "testprog", "-n", "5", "--num", "2", "--foo=3", "--", "-fex", "-I./foo"};
@@ -225,7 +222,7 @@ fn void test_argparse_next_all_together()
 
 Switching over options:
 ```c3
-int! sum_args(String argv[]) 
+int? sum_args(String argv[]) 
 { 
     ArgParse agp = {
         .description = "Test number sum program",
@@ -254,7 +251,7 @@ int! sum_args(String argv[])
 }
 ```
 *>
-fn String! ArgParse.next(&self, String[] argv) 
+fn String? ArgParse.next(&self, String[] argv) 
 {
     assert(self.arguments.len == 0, "ArgParse already initialized or double parse call");
 
@@ -274,7 +271,7 @@ fn String! ArgParse.next(&self, String[] argv)
         String arg = self._ctx.argv[0];
         if (arg.len == 0) {
             io::printf("Error: argument too short `%s`\n", arg);
-            return ArgError.INVALID_ARGUMENT?;
+            return INVALID_ARGUMENT?;
         }
         if (self._ctx.cpidx > 0) {
             // we have --opt=foo, return 'foo' part
@@ -287,7 +284,7 @@ fn String! ArgParse.next(&self, String[] argv)
 
                 if (idx == arg.len-1) {
                     io::printf("Error: option has no value `%s`\n", arg);
-                    return ArgError.INVALID_ARGUMENT?;
+                    return INVALID_ARGUMENT?;
                 }
                 arg = arg[..idx-1];
                 // return '--opt' part
@@ -305,11 +302,11 @@ fn String! ArgParse.next(&self, String[] argv)
 <*
 Parses all arguments.
 
-@param argv "arguments list from system argv or from previous argparse.arguments for subcommands"
-@return! ArgError.INVALID_ARGUMENT
-@return! ArgError.MISSING_ARGUMENT
+@param argv: "arguments list from system argv or from previous argparse.arguments for subcommands"
+@return? INVALID_ARGUMENT
+@return? MISSING_ARGUMENT
 *>
-fn void! ArgParse.parse(&self, String[] argv)
+fn void? ArgParse.parse(&self, String[] argv)
 {
     assert(self.arguments.len == 0, "ArgParse already initialized or double parse call");
     assert(!self._ctx.has_argument, "ArgParse.next() already used before (pick only one way)?");
@@ -330,7 +327,7 @@ fn void! ArgParse.parse(&self, String[] argv)
         // io::printf("arg: %s\n", arg);
         if (arg.len == 0) {
             io::printf("Error: argument too short `%s`\n", arg);
-            return ArgError.INVALID_ARGUMENT?;
+            return INVALID_ARGUMENT?;
         }
 
         if (arg.len == 1 || arg[0] != '-' || arg[1] == '\0') {
@@ -352,7 +349,7 @@ fn void! ArgParse.parse(&self, String[] argv)
 
             if (self._ctx.has_argument) {
                 io::printf("Error: passing options after arguments not allowed at `%s`\n", arg);
-                return ArgError.INVALID_ARGUMENT?;
+                return INVALID_ARGUMENT?;
             }
 
             self.parse_short_arg()!;
@@ -375,7 +372,7 @@ fn void! ArgParse.parse(&self, String[] argv)
 
         if (self._ctx.has_argument) {
             io::printf("Error: passing options after arguments not allowed at `%s`\n", arg);
-            return ArgError.INVALID_ARGUMENT?;
+            return INVALID_ARGUMENT?;
         }
 
         self.parse_long_arg()!;
@@ -388,14 +385,14 @@ fn void! ArgParse.parse(&self, String[] argv)
     self.arguments = argv[self._ctx.cpidx + 1 ..];  // excludes 1st argv[0], program_name
     if (self.flags.require_arguments && self.arguments.len == 0) {
         io::printf("Error: positional argument expected\n");
-        return ArgError.MISSING_ARGUMENT?;
+        return MISSING_ARGUMENT?;
     }
 }
 
 <*
 Prints program usage based on ArgParse fields composition
 *>
-fn void! ArgParse.print_usage(&self)
+fn void? ArgParse.print_usage(&self)
 {
     assert(self.options.len > 0, "ArgParse is not properly configured, or using ArgParse.next()");
 
@@ -404,7 +401,7 @@ fn void! ArgParse.print_usage(&self)
         @pool() {
             // NOTE: prepending program_name to all usage line
 
-            path::Path path = path::temp_new(self.program_name)!;
+            path::Path path = path::temp(self.program_name)!;
             foreach (usage : self.usage.tsplit("\n")) {
                 usage = usage.trim();
                 if (!usage) {
@@ -529,14 +526,12 @@ fn void! ArgParse.print_usage(&self)
 *                  PRIVATE IMPLEMENTATION
 */
 
-fault ArgError @private
-{
+faultdef
     MISSING_ARGUMENT,
     INVALID_ARGUMENT,
     ARGUMENT_VALUE,
     CONFIGURATION,
-    HELP_SHOW,
-}
+    HELP_SHOW;
 
 enum ArgType : int @private
 {
@@ -547,7 +542,7 @@ enum ArgType : int @private
 
 $assert(ArgType.USER.ordinal == 0);  // USER must be first to support ZII behavior
 
-fn void! ArgParse.options_ensure_required(&self) @local
+fn void? ArgParse.options_ensure_required(&self) @local
 {
     bool has_errors = false;
     foreach (i, opt : self.options) {
@@ -561,11 +556,11 @@ fn void! ArgParse.options_ensure_required(&self) @local
         }
     }
     if (has_errors) {
-        return ArgError.MISSING_ARGUMENT?;
+        return MISSING_ARGUMENT?;
     }
 }
 
-fn void! ArgParse.options_check(&self) @local
+fn void? ArgParse.options_check(&self) @local
 {
     assert(self.arguments.len == 0, "already processed?");
 
@@ -625,7 +620,7 @@ fn void! ArgParse.options_check(&self) @local
     }
 }
 
-fn String! ArgParse.get_arg(&self) @local
+fn String? ArgParse.get_arg(&self) @local
 {
     if (self._ctx.optvalue) {
         // --arg=<optvalue> via =
@@ -641,26 +636,26 @@ fn String! ArgParse.get_arg(&self) @local
                 "Error: getting another option instead of previous option value at `%s`\n",
                 self._ctx.argv[0]
             );
-            return ArgError.ARGUMENT_VALUE?;
+            return ARGUMENT_VALUE?;
         }
         return result;
     } else {
         io::printf("Error: missing argument value for %s\n", self._ctx.argv[0]);
-        return ArgError.ARGUMENT_VALUE?;
+        return ARGUMENT_VALUE?;
     }
 
 }
 
-fn void! ArgParse.parse_arg_val(&self, ArgOpt* opt, bool flag_unset = false) @local
+fn void? ArgParse.parse_arg_val(&self, ArgOpt* opt, bool flag_unset = false) @local
 {
     assert(opt);
     if (opt._arg_type == ArgType.HELP) {
-        return ArgError.HELP_SHOW?;
+        return HELP_SHOW?;
     }
 
     if (opt._is_present && !opt.allow_many) {
         io::printf("Error: duplicated option %s\n", self._ctx.argv[0]);
-        return ArgError.INVALID_ARGUMENT?;
+        return INVALID_ARGUMENT?;
     }
 
     assert(opt.value);
@@ -714,41 +709,43 @@ fn void! ArgParse.parse_arg_val(&self, ArgOpt* opt, bool flag_unset = false) @lo
     }
 }
 
-fn void! ArgParse.parse_short_arg(&self) @local
+fn void? ArgParse.parse_short_arg(&self) @local
 {
     foreach (&opt : self.options) {
         if (opt.short_name == self._ctx.optvalue[0]) {
             self._ctx.optvalue = self._ctx.optvalue.len > 1 ? self._ctx.optvalue[1..] : "";
             if (catch err = self.parse_arg_val(opt)) {
-                case ArgError.MISSING_ARGUMENT:
-                case ArgError.INVALID_ARGUMENT:
-                case ArgError.ARGUMENT_VALUE:
-                case ArgError.CONFIGURATION:
-                case ArgError.HELP_SHOW:
+                switch (err) {
+                case MISSING_ARGUMENT:
+                case INVALID_ARGUMENT:
+                case ARGUMENT_VALUE:
+                case CONFIGURATION:
+                case HELP_SHOW:
                     return err?;
                 default:
                     io::printf(
                         "Error: argument parse error -%s failed with `%s`\n", opt.short_name, err
                     );
-                    return ArgError.ARGUMENT_VALUE?;
+                    return ARGUMENT_VALUE?;
+                }
             }
             return;  // ALL OK
         }
     }
     io::printf("Error: invalid argument %s\n", self._ctx.argv[0]);
-    return ArgError.INVALID_ARGUMENT?;
+    return INVALID_ARGUMENT?;
 }
 
-fn String! prefix_skip(String s, String prefix) @local
+fn String? prefix_skip(String s, String prefix) @local
 {
     if (s.starts_with(prefix)) {
         return s[prefix.len ..];
     } else {
-        return ArgError.MISSING_ARGUMENT?;
+        return MISSING_ARGUMENT?;
     }
 }
 
-fn void! ArgParse.parse_long_arg(&self) @local
+fn void? ArgParse.parse_long_arg(&self) @local
 {
     foreach (&opt : self.options) {
         if (!opt.long_name) {
@@ -757,10 +754,10 @@ fn void! ArgParse.parse_long_arg(&self) @local
 
         int opt_flags = 0;
         bool flag_unset = false;
-        String! arg = prefix_skip(self._ctx.argv[0][2..], opt.long_name);
+        String? arg = prefix_skip(self._ctx.argv[0][2..], opt.long_name);
         if (catch err = arg) {
             switch (err) {
-                case ArgError.MISSING_ARGUMENT:
+                case MISSING_ARGUMENT:
                     // NOTE: for boolean flags it's possible to pass unset with '--no-<flag_name>'
                     if (
                         opt.value.type == bool.typeid &&
@@ -781,21 +778,23 @@ fn void! ArgParse.parse_long_arg(&self) @local
         }
 
         if (catch err = self.parse_arg_val(opt, flag_unset)) {
-            case ArgError.MISSING_ARGUMENT:
-            case ArgError.INVALID_ARGUMENT:
-            case ArgError.ARGUMENT_VALUE:
-            case ArgError.CONFIGURATION:
-            case ArgError.HELP_SHOW:
-                return err?;
-            default:
-                io::printf(
-                    "Error: argument parse error %s failed with `%s`\n", self._ctx.argv[0], err
-                );
-                return ArgError.ARGUMENT_VALUE?;
+            switch (err) {
+                case MISSING_ARGUMENT:
+                case INVALID_ARGUMENT:
+                case ARGUMENT_VALUE:
+                case CONFIGURATION:
+                case HELP_SHOW:
+                    return err?;
+                default:
+                    io::printf(
+                        "Error: argument parse error %s failed with `%s`\n", self._ctx.argv[0], err
+                    );
+                    return ARGUMENT_VALUE?;
+            }
         }
         return;  // ALL OK
     }
 
     io::printf("Error: invalid argument %s\n", self._ctx.argv[0]);
-    return ArgError.INVALID_ARGUMENT?;
+    return INVALID_ARGUMENT?;
 }

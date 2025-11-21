@@ -114,6 +114,8 @@ macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* 
             switch (prev_t) {
                 case AMP:  // likely &Type.foo
                     if (self._resolve__prev_is_binexp()) pre_space = true;
+                case LBRACE:
+                    break;
                 default:
                     nextcase TOP: default;
             }
@@ -149,6 +151,7 @@ macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* 
                 case STAR:
                 case LBRACKET:
                 case RGENPAR:
+                case RBRACE:
                 case RVEC:
                 case BANG:
                     break;
@@ -200,6 +203,7 @@ macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* 
                 case CT_TYPE_IDENT:
                 case RPAREN:
                 case RGENPAR:
+                case RBRACE:
                 case RVEC:
                 case LPAREN:
                     break;
@@ -211,22 +215,29 @@ macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* 
         case RPAREN:
             break;
         case RBRACE:
+            // HACK: generic type related braces are handled in dump func.
+
             // array related brace
             switch (prev_t) {
                 case LBRACE:
                     // empty {}
                     break;
                 default:
-                    pre_space = state.scope_depth == 0;
+                    pre_space = self._resolve__rbrace_prespace();
             }
             break;
         case LBRACE:
             switch (prev_t) {
+                case IDENT:
+                case TYPE_IDENT:
+                case CT_TYPE_IDENT:
                 case RGENPAR:
+                case RBRACE:
                 case RVEC:
-                    // List(<Foo>){}.init(...)
+                    // (List{Foo}){}.init(...)
                     break;
                 case COMMA:
+                case RPAREN:
                     pre_space = true;
                 default:
                     nextcase TOP: default;
@@ -290,6 +301,7 @@ macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* 
                 case CT_TYPE_IDENT:
                 case RVEC:
                 case RGENPAR:
+                case RBRACE:
                 case STAR:
                 case GREATER:  // new generic syntax Foo<[bar]>
                 case QUESTION:
@@ -392,6 +404,7 @@ macro bool CodeFmt._resolve_default_space(&self, NodeParserState* state, Token* 
         case CONTINUE:
         case RVEC:
         case RGENPAR:
+        case RBRACE:
         case TRY:
         case FN:
         case IF:
@@ -502,6 +515,7 @@ fn bool CodeFmt._resolve__prev_bang_type(&self) @private
         case TYPE_IDENT:
         case RVEC:
         case RGENPAR:
+        case RBRACE:
         case STAR:
         case GREATER:  // new generic notation ]>
             return true;
@@ -655,6 +669,8 @@ fn bool CodeFmt._resolve__prev_is_binexp(&self) @private
             case RVEC:
             case LGENPAR:
             case RGENPAR:
+            case LBRACE:
+            case RBRACE:
                 has_brackets = true;
             case BIT_AND_ASSIGN:
             case BIT_OR_ASSIGN:
@@ -702,7 +718,7 @@ fn bool CodeFmt._resolve__prev_is_binexp(&self) @private
     do {
         if (has_parens) {
             // simple cast (void*)
-            // generic cast (Foo(<void>)*) / array cast (char[8]*)
+            // generic cast (Foo{void}*) / array cast (char[8]*)
             if (has_type) {
                 if(has_typeof || !has_vars) is_cast = true;
                 break;
@@ -735,7 +751,7 @@ fn bool CodeFmt._resolve__prev_is_binexp(&self) @private
 *>
 fn usz CodeFmt._resolve__next_is_cast_and_dump(&self, usz current_idx) @private
 {
-    NodeParserState tmpstate = NodeParserState {};
+    NodeParserState tmpstate = {};
 
     bool is_cast = true;
     bool has_type = false;
@@ -763,6 +779,8 @@ fn usz CodeFmt._resolve__next_is_cast_and_dump(&self, usz current_idx) @private
             case RVEC:
             case LGENPAR:
             case RGENPAR:
+            case LBRACE:
+            case RBRACE:
                 break;
             default:
                 is_cast = false;
@@ -826,6 +844,8 @@ fn bool CodeFmt._resolve__prev_is_cast(&self) @private
             case RVEC:
             case LGENPAR:
             case RGENPAR:
+            case LBRACE:
+            case RBRACE:
             case LBRACKET:
             case RBRACKET:
             case QUESTION:
@@ -836,6 +856,22 @@ fn bool CodeFmt._resolve__prev_is_cast(&self) @private
         }
     }
     return is_cast && has_type;
+}
+
+<*
+ Checks previous token type in token cache
+*>
+fn TokenType CodeFmt._resolve__prev_token(&self, usz current_idx, usz nth) @private
+{
+    isz idx = (isz)current_idx;
+    usz count = 0;
+    TokenType result = INVALID_TOKEN;
+    while (--idx >= 0) {
+        result = self.__token_cache[idx].type;
+        if (result != SPACE) count++;
+        if (count >= nth) break;
+    }
+    return result;
 }
 
 <*
@@ -854,13 +890,28 @@ fn TokenType CodeFmt._resolve__next_token(&self, usz current_idx) @private
 <*
  Checks if we need a white space before ?
 *>
-fn bool CodeFmt._resolve__next_question_is_error(&self, usz current_idx) @private
+fn bool CodeFmt._resolve__question_prespace(&self, usz current_idx) @private
 {
     // Resolves ambiguity
     // foo ? bar : baz;
-    // return foo?;
-    // foo ?? ERR?!;
+    // foo ?? ERR?;
     // a = foo ? !bar : baz;
+    // List{Foo}? foo_list;
+    // List{Foo}*? foo_list_ptr;
+
+    // Resolve by previous token.
+    switch (self._resolve__prev_token(current_idx, 1)) {
+        case TYPE_IDENT:
+        case RVEC:
+        case STAR:
+        case RBRACE:
+            // No pre-space if previous expression is a type (array, vector, pointer, generic type).
+            return false;
+        default:
+            break;
+    }
+
+    // Resolve by next token.
     switch (self._resolve__next_token(current_idx)) {
         case EOS:
         case RPAREN:
@@ -869,6 +920,7 @@ fn bool CodeFmt._resolve__next_question_is_error(&self, usz current_idx) @privat
         case RBRACKET:
         case RVEC:
         case RGENPAR:
+        case RBRACE:
         case INVALID_TOKEN:
             return false;
         case BANG:
@@ -881,4 +933,36 @@ fn bool CodeFmt._resolve__next_question_is_error(&self, usz current_idx) @privat
             break;
     }
     return true;
+}
+
+fn isz CodeFmt.__locate_matching_lbrace(&self) @private
+{
+    isz scope_depth = 1;
+    isz idx = (isz)self.__token_cache.len();
+    while (--idx >= 0) {
+        switch (self.__token_cache[idx].type) {
+            case RBRACE: scope_depth++;
+            case LBRACE: scope_depth--;
+            default: break;
+        }
+        if (scope_depth == 0) return idx;
+    }
+    return -1;
+}
+
+<*
+ Determine if a space should add before '}'.
+*>
+fn bool CodeFmt._resolve__rbrace_prespace(&self) @private
+{
+    if (self.state_stack.len() == 0) return false;
+    if (self.__token_cache.len() == 0) return false;
+
+    isz lbrace = self.__locate_matching_lbrace();
+    if (lbrace == -1) return false;
+
+    // We take a shortcut to make thing easier.
+    // Since the LBRACE is properly formatted already, we just mirror the space after it.
+    return self.__token_cache[lbrace+1].type == SPACE
+        && self.__token_cache[^1].type != SPACE;
 }

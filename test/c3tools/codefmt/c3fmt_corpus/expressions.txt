@@ -159,16 +159,16 @@ generic_vec_expr
 ================================================================================
 
 fn void main() { 
-List(<Foo*>) lfoo;
-List(<Foo*>)* lfoo = List(<Foo*>){}.init(bar: 1);
+List{Foo*} lfoo;
+List{Foo*}* lfoo = List{Foo*}{}.init(bar: 1);
 int[<2>]* lfoo = int[<2 >]{}.init(bar: 1);
 }
 
 --------------------------------------------------------------------------------
 fn void main()
 {
-    List(<Foo*>) lfoo;
-    List(<Foo*>)* lfoo = List(<Foo*>){}.init(bar: 1);
+    List{Foo*} lfoo;
+    List{Foo*}* lfoo = List{Foo*}{}.init(bar: 1);
     int[<2>]* lfoo = int[<2>]{}.init(bar: 1);
 }
 ================================================================================
@@ -245,22 +245,21 @@ macro bool char_is_base64(char c)
 bang_expressions
 ================================================================================
 
-fn List(<int>)! foo() => 0;
-fn int[<2>]! foo() => 0;
+fn List{int}? foo() => 0;
+fn int[<2>]? foo() => 0;
 
-def TFoo = fn List(<int>)! foo();
-def TFoo = fn int[<3>]! foo();
-def TFoo = fn int! foo();
-def TFoo = fn int*! foo();
+def TFoo = fn List{int}? foo();
+def TFoo = fn int[<3>]? foo();
+def TFoo = fn int? foo();
+def TFoo = fn int*? foo();
 
-fn void! main() { 
-    char! c = call();
-    char*! c = call();
+fn void? main() { 
+    char? c = call();
+    char*? c = call();
     char c = call()!;
     char c = !call();
-    int[<2>]! c = call();
-    List<[2]>! c = call();
-    List(<2>)! c = call();
+    int[<2>]? c = call();
+    List{2}? c = call();
     if(!foo()) return 0;
     if(!foo() && (!(foo | bar) && !foo)) return 0;
     return !(!foo());
@@ -268,23 +267,22 @@ fn void! main() {
 }
 
 --------------------------------------------------------------------------------
-fn List(<int>)! foo() => 0;
-fn int[<2>]! foo() => 0;
+fn List{int}? foo() => 0;
+fn int[<2>]? foo() => 0;
 
-def TFoo = fn List(<int>)! foo();
-def TFoo = fn int[<3>]! foo();
-def TFoo = fn int! foo();
-def TFoo = fn int*! foo();
+def TFoo = fn List{int}? foo();
+def TFoo = fn int[<3>]? foo();
+def TFoo = fn int? foo();
+def TFoo = fn int*? foo();
 
-fn void! main()
+fn void? main()
 {
-    char! c = call();
-    char*! c = call();
+    char? c = call();
+    char*? c = call();
     char c = call()!;
     char c = !call();
-    int[<2>]! c = call();
-    List <[2] >! c = call();
-    List(<2>)! c = call();
+    int[<2>]? c = call();
+    List{2}? c = call();
     if (!foo()) return 0;
     if (!foo() && (!(foo | bar) && !foo)) return 0;
     return !(!foo());
@@ -416,13 +414,13 @@ fn void main()
 {
     String text = io::readline() ?? InputResult.FAILED_TO_READ?!;
     io::fprintf(out, "%s", s.title.get() ?? "missing", s.ok)!;
-    return Summary {
-        .title = new_string_val(doc.head.get().title.get()) ?? MaybeString {},
+    return (Summary){
+        .title = new_string_val(doc.head.get().title.get()) ?? (MaybeString){},
         .ok = true,
     };
     long e10 = String.to_long() ?? NumberConversion.MALFORMED_FLOAT ? !;
     url.path = decode(allocator) ?? UrlParsingResult.INVALID_PATH ? !;
-    int! b = foo((a + 3) ?? 2);
+    int? b = foo((a + 3) ?? 2);
     char* data4 = $embed("fiek") ?? null;
     bool r = foo ? !bar : !vrr;
     bool r = foo ? (!bar) : !vrr;
@@ -432,13 +430,13 @@ fn void main()
 {
     String text = io::readline() ?? InputResult.FAILED_TO_READ?!;
     io::fprintf(out, "%s", s.title.get() ?? "missing", s.ok)!;
-    return Summary {
-        .title = new_string_val(doc.head.get().title.get()) ?? MaybeString {},
+    return (Summary) {
+        .title = new_string_val(doc.head.get().title.get()) ?? (MaybeString) {},
         .ok = true,
     };
     long e10 = String.to_long() ?? NumberConversion.MALFORMED_FLOAT?!;
     url.path = decode(allocator) ?? UrlParsingResult.INVALID_PATH?!;
-    int! b = foo((a + 3) ?? 2);
+    int? b = foo((a + 3) ?? 2);
     char* data4 = $embed("fiek") ?? null;
     bool r = foo ?!bar : !vrr;
     bool r = foo ? (!bar) : !vrr;
@@ -493,31 +491,39 @@ fn void main()
 --------------------------------------------------------------------------------
 fn void main()
 {
-    f64_helper(x64, x64, 1.0, 1.0, 1.0, 1.0, 1.0, (Complex){1.0, 1.0});
-    blorg((Test){});
-    return (Test){};
+    f64_helper(x64, x64, 1.0, 1.0, 1.0, 1.0, 1.0, (Complex) {1.0, 1.0});
+    blorg((Test) {});
+    return (Test) {};
     f_va_callee(
         1,
         2,
         3,
         4.0,
         5.0,
-        (Tiny){6, 7, 8, 9},
-        (Small){10, null},
-        (Small_aligned){11},
-        (Large){12, 13, 14, 15}
+        (Tiny) {6, 7, 8, 9},
+        (Small) {10, null},
+        (Small_aligned) {11},
+        (Large) {12, 13, 14, 15}
     );
-    int[?][?][] x = (int[2][1][]){ { {1, 2}} };
-    int z = (int)(Foo){ .abc = 2, .defg = 1 };
-    Foo4* f4 = &&(Foo4){ .expand = 2, .a = true, .b = true, .widget = &f };
-    io::printfn("%s", $$reduce_max((double[<2>]){23.2, 23.3}));
-    var $b4 = x'403322' +++ (char[2]){ 1, 2 };
-    IFoo foo = @clone((Ba){});
-    if (contains(url, "title-missing")) return { dupe((Head){.title = null})! };
-    return buildSummary(readDoc(url)) ?? (Summary){
+    int[?][?][] x = (int[2][1][]) { { {1, 2} } };
+    int z = (int)(Foo) { .abc = 2, .defg = 1 };
+    Foo4* f4 = &&(Foo4) { .expand = 2, .a = true, .b = true, .widget = &f };
+    io::printfn("%s", $$reduce_max((double[<2>]) {23.2, 23.3}));
+    var $b4 = x'403322' +++ (char[2]) { 1, 2 };
+    IFoo foo = @clone((Ba) {});
+    if (contains(url, "title-missing")) return { dupe((Head) {.title = null})! };
+    return buildSummary(readDoc(url)) ?? (Summary) {
         .title = null, .ok = false
     };
-    bool x = !(int[]){ 1, 2, 3 };
-    int x = $typeof((int[?]){1, 2, 3}).len;
-    result = mem::gather(y, (bool[<2>]){true, false}, (int[<2>]){10, 20});
+    bool x = !(int[]) { 1, 2, 3 };
+    int x = $typeof((int[?]) {1, 2, 3}).len;
+    result = mem::gather(y, (bool[<2>]) {true, false}, (int[<2>]) {10, 20});
 }
+================================================================================
+my_test
+================================================================================
+List{2}? c = call();
+List{2}? c = call();
+--------------------------------------------------------------------------------
+List{2}? c = call();
+List{2}? c = call();

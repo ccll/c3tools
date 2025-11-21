@@ -6,13 +6,11 @@ import std::collections::list;
 import std::collections::map;
 import std::io;
 
-fault CodeCorpusError
-{
+faultdef
     EMPTY_FILE,
     BAD_FORMAT,
     DUPLICATE_NAME,
-    BAD_NAME,
-}
+    BAD_NAME;
 
 struct CodeCorpus
 {
@@ -26,11 +24,11 @@ struct CodeCorpus
 
 fn bool compare_output(String expected, String actual)
 {
-    String[] lines_expected = expected.split("\n");
-    String[] lines_actual = actual.split("\n");
+    String[] lines_expected = expected.split(mem, "\n",);
+    String[] lines_actual = actual.split(mem, "\n");
 
-    defer allocator::heap().release(lines_expected.ptr, true);
-    defer allocator::heap().release(lines_actual.ptr, true);
+    defer mem::free(lines_expected);
+    defer mem::free(lines_actual);
 
     int n_errors = 0;
     for (int i = 0, int j = 0; i < lines_expected.len || j < lines_actual.len; i++, j++) {
@@ -75,20 +73,21 @@ fn bool check_casename(String case_name)
     return true;
 }
 
-fn List(<CodeCorpus>)! new_parse(String file_name)
+fn List{CodeCorpus}? new_parse(String file_name)
 {
-    String contents = (String)file::load_new(file_name)!;
-    List(<CodeCorpus>) result;
+    String contents = (String)file::load(mem, file_name)!;
+    List{CodeCorpus} result;
 
-    HashMap(<String, int>)* unique_names = HashMap(<String, int>){}.new_init();
+    HashMap{String, int} unique_names;
+    unique_names.init(mem);
     defer unique_names.free();
 
-    result.new_init();
+    result.init(mem);
 
-    String[] lines = contents.split("\n");
-    defer allocator::heap().release(lines.ptr, true);
+    String[] lines = contents.split(mem, "\n");
+    defer mem::free(lines.ptr);
 
-    if (!lines) return CodeCorpusError.EMPTY_FILE?;
+    if (!lines) return EMPTY_FILE?;
 
     CodeCorpus current = { .file_name = file_name, .line = 1 };
 
@@ -108,7 +107,7 @@ fn List(<CodeCorpus>)! new_parse(String file_name)
                     i + 1,
                     l.len
                 );
-                return CodeCorpusError.BAD_FORMAT?;
+                return BAD_FORMAT?;
             }
 
             if (current.phase > 2) {
@@ -129,18 +128,18 @@ fn List(<CodeCorpus>)! new_parse(String file_name)
                     io::printfn("```");
                     io::printf("output:\n%s", current.case_output);
                     io::printfn("```");
-                    return CodeCorpusError.BAD_FORMAT?;
+                    return BAD_FORMAT?;
                 }
 
                 result.push(current);
-                current = CodeCorpus { .file_name = file_name, .line = i + 1 };
+                current = { .file_name = file_name, .line = i + 1 };
             }
 
             current.phase++;
             if (current.phase > 1) {
                 if (!current.case_name) {
                     io::printfn("Probably missing case name (%s:%s)", file_name, i + 1);
-                    return CodeCorpusError.BAD_FORMAT?;
+                    return BAD_FORMAT?;
                 }
             }
             continue;
@@ -154,12 +153,12 @@ fn List(<CodeCorpus>)! new_parse(String file_name)
                     i + 1,
                     l.len
                 );
-                return CodeCorpusError.BAD_FORMAT?;
+                return BAD_FORMAT?;
             }
 
             if (current.phase != 3) {
                 io::printfn("---- line is probably is out of order at (%s:%s)", file_name, i + 1);
-                return CodeCorpusError.BAD_FORMAT?;
+                return BAD_FORMAT?;
             }
 
             current.phase++;
@@ -170,7 +169,7 @@ fn List(<CodeCorpus>)! new_parse(String file_name)
             current.case_name = l.trim();
             if (unique_names.has_key(current.case_name)) {
                 io::printfn("Duplicate case name: %s at line %d", current.case_name, i + 1);
-                return CodeCorpusError.DUPLICATE_NAME?;
+                return DUPLICATE_NAME?;
             }
 
             if (!check_casename(current.case_name)) {
@@ -179,7 +178,7 @@ fn List(<CodeCorpus>)! new_parse(String file_name)
                     current.case_name,
                     i + 1
                 );
-                return CodeCorpusError.BAD_NAME?;
+                return BAD_NAME?;
             }
             unique_names.set(current.case_name, 1);
             current.phase++;
@@ -222,7 +221,7 @@ fn List(<CodeCorpus>)! new_parse(String file_name)
             }
         } else {
             io::printfn("Unexpected phase count (%s:%s)", file_name, i + 1);
-            return CodeCorpusError.BAD_FORMAT?;
+            return BAD_FORMAT?;
         }
 
     }

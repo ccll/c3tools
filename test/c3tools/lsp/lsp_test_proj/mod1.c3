@@ -1,7 +1,7 @@
 module test::c3tools::lsp_test_mod1;
 
 // NOTE: this symbol will not be added to file scope symbol (only global one)
-def MyInt = int;
+alias MyInt = int;
 
 // should be in file scope
 int global_int @local = 2;

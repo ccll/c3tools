@@ -11,8 +11,8 @@ struct CodeFmt
 {
     Lexer _lexer;
     DString buf;
-    List(<CodeFmtState>) state_stack;
-    List(<Token>) __token_cache;
+    List{CodeFmtState} state_stack;
+    List{Token} __token_cache;
     char indent_type;
     usz max_line_width;
     usz _indent_level;
@@ -28,7 +28,7 @@ struct CodeFmt
 <*
  CodeFmt processing function signature
 *>
-def CodeFmtFn = fn bool! (CodeFmt* self, Token* t, NodeParserState* state) @private;
+alias CodeFmtFn = fn bool? (CodeFmt* self, Token* t, NodeParserState* state);
 
 <*
  Item for code formatting state stack
@@ -41,7 +41,7 @@ struct CodeFmtState @private
 }
 
 <* Simple white space synthetic token *>
-const Token TOKEN_SPACE @private = Token { .type = SPACE, .value = " " };
+const Token TOKEN_SPACE @private = { .type = SPACE, .value = " " };
 
 /*
 *                  CODE FORMATTER OBJECT
@@ -53,15 +53,15 @@ const Token TOKEN_SPACE @private = Token { .type = SPACE, .value = " " };
  @require max_line_width >= 80 : "too short"
  @require max_line_width <= 120 : "too long"
 *>
-fn CodeFmt CodeFmt.new_init(int max_line_width = 80, char indent_type = '4') @operator(construct)
+fn CodeFmt new_init(int max_line_width = 80, char indent_type = '4')
 {
     CodeFmt self = {
         .max_line_width = max_line_width,
         .indent_type = indent_type,
     };
-    self.buf.new_init();
-    self.state_stack.new_init();
-    self.__token_cache.new_init();
+    self.buf.init(mem);
+    self.state_stack.init(mem);
+    self.__token_cache.init(mem);
     return self;
 }
 
@@ -81,7 +81,7 @@ fn void CodeFmt.free(&self)
 
  NOTE: result will live until next CodeFmt.format() or CodeFmt.free() call 
 *>
-fn String! CodeFmt.format(&self, String contents, bool print_lex = false)
+fn String? CodeFmt.format(&self, String contents, bool print_lex = false)
 {
     switch (self.indent_type) {
         case '2':
@@ -91,7 +91,7 @@ fn String! CodeFmt.format(&self, String contents, bool print_lex = false)
             break;
         default:
             io::eprintfn("Invalid separator value: expected 2,4,8 or t");
-            return IoError.GENERAL_ERROR?;
+            return io::GENERAL_ERROR?;
     }
 
     self._print_lex = print_lex;
@@ -155,7 +155,7 @@ fn String! CodeFmt.format(&self, String contents, bool print_lex = false)
 <*
  Pushes new state handler function to stack. Allows parsing sub-structs, etc...
 *>
-fn bool! CodeFmt.push_run_state(
+fn bool? CodeFmt.push_run_state(
     &self, CodeFmtFn new_state, Token* t, TokenType initial_token = INVALID_TOKEN
 ) @private
 {
@@ -178,7 +178,7 @@ fn bool! CodeFmt.push_run_state(
 <*
  Pops last state from state_stack
 *>
-fn void! CodeFmt.pop_state(&self) @private
+fn void? CodeFmt.pop_state(&self) @private
 {
     assert(self.cache_statement_len() == 0, "cache_statement is not empty, forgot dump?");
 
@@ -188,7 +188,7 @@ fn void! CodeFmt.pop_state(&self) @private
 <*
  Runs last state in the state_stack with current token
 *>
-fn bool! CodeFmt.run_state(&self, Token* t) @private
+fn bool? CodeFmt.run_state(&self, Token* t) @private
 {
     if (self.state_stack.len() == 0) return false;
     CodeFmtFn state_fn = self.state_stack[^1].state_fn;
@@ -199,7 +199,7 @@ fn bool! CodeFmt.run_state(&self, Token* t) @private
 <*
  Emits formatting procedure error with debug message
 *>
-macro bool! CodeFmt.@fail(&self, Token* t, String msg) @private
+macro bool? CodeFmt.@fail(&self, Token* t, String msg) @private
 {
     if (t != null) {
         io::eprintfn("Patially formatted code:\n```\n%s```", self.buf.str_view());
@@ -215,7 +215,7 @@ macro bool! CodeFmt.@fail(&self, Token* t, String msg) @private
     } else {
         io::eprintfn("Error at line %s - %s", self._lexer.current_row, msg);
     }
-    return IoError.GENERAL_ERROR?;
+    return io::GENERAL_ERROR?;
 }
 
 <*
@@ -300,7 +300,7 @@ macro void CodeFmt.indent(&self) @private
 <*
  Decreases code indent
 *>
-macro void! CodeFmt.dedent(&self) @private
+macro void? CodeFmt.dedent(&self) @private
 {
     self.trace("dedent");
     if (self._indent_level == 0) {

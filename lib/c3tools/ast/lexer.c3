@@ -9,7 +9,7 @@ import std::collections::list;
 // Use of this source code is governed by the MIT license
 // a copy of which can be found in the LICENSE_STDLIB file.
 
-def Lexer = LexerImp;
+alias Lexer = LexerImp;
 
 struct LexerImp
 {
@@ -37,8 +37,8 @@ struct Token (Printable)
 
 fn String Token.to_string(&self, Allocator allocator) @dynamic
 {
-    @pool(allocator) {
-        DString builder = dstring::temp_new();
+    @pool() {
+        DString builder = dstring::temp();
         builder.appendf("{\n");
         builder.appendf("    type: %s\n", self.type);
         builder.appendf("    value: `%s`\n", self.value);
@@ -112,11 +112,11 @@ fn void Token.print(&self, bool new_line = false, int padding = 0)
 <*
  Initializes new lexer instance
 
- @param contents `c3 source contents`
+ @param contents: `c3 source contents`
 *>
 fn void init(Lexer* lexer, String contents)
 {
-    *lexer = Lexer {};
+    *lexer = {};
     // Set the current file.
     // lexer.file_begin = lexer.file.contents;
     lexer.file_begin = contents;
@@ -170,16 +170,16 @@ fn bool Lexer.next_token(&self)
 <*
  Parses lexer contents and returns new list of all available tokens
 
- @param allocator "optional allocator for resulting list"
+ @param allocator: "optional allocator for resulting list"
  @return "list of all tokens in lexer string"
 *>
-fn List(<lexer::Token>) Lexer.new_parse_tokens(&self, Allocator allocator = allocator::heap())
+fn List{lexer::Token} Lexer.new_parse_tokens(&self, Allocator allocator = mem)
 {
     assert(self.file_begin, "not initialied");
     assert(self.file_begin == self.current, "already processed");
 
-    List(<Token>) result;
-    result.new_init(allocator: allocator);
+    List{Token} result;
+    result.init(allocator);
 
     while (self.next_token()) {
         result.push(self.token);

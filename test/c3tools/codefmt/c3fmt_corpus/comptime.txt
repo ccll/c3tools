@@ -262,7 +262,7 @@ macro @foo($x, #y)
 ================================================================================
 ct_if_hierarchical
 ================================================================================
-fn Path! new_get_config_dir(Allocator allocator = allocator::heap())
+fn Path? new_get_config_dir(Allocator allocator = allocator::heap())
 {
     @pool(allocator)
     {
@@ -281,7 +281,7 @@ fn Path! new_get_config_dir(Allocator allocator = allocator::heap())
     };
 }
 --------------------------------------------------------------------------------
-fn Path! new_get_config_dir(Allocator allocator = allocator::heap())
+fn Path? new_get_config_dir(Allocator allocator = allocator::heap())
 {
     @pool(allocator) {
         $if env::WIN32:

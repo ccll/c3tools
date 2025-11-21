@@ -26,7 +26,7 @@ fn void test5(int a) => a * 2;
 fn void test6(int a) => a * 2;
 
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
-    DString contents = dstring::temp_new(code);
+    DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: false);
     defer mem::free(ast._allocator);
     contents.clear();
@@ -50,7 +50,7 @@ fn void test6(int a) => a * 2;
     io::printfn("'%s' hash: %s", m.node.value, m.hash);
     test::ne(m.hash, (Fnv32a)0);
 
-    LspProject proj = LspProject.new_init("", "");
+    LspProject proj = project::new_lsp_project("", "");
     defer proj.free();
 
     proj.load_source(code, "foo.c3")!!;
@@ -79,7 +79,7 @@ fn void test6(int a) => a * 2;
 
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
 
-    LspProject proj = LspProject.new_init("", "");
+    LspProject proj = project::new_lsp_project("", "");
     defer proj.free();
 
     proj.load_source(code, "foo.c3")!!;
@@ -92,20 +92,20 @@ fn void test6(int a) => a * 2;
     SymbolItem* m = proj.modules.first("test::std::c3lang::ast");
     test::eq(proj.modules.get_name(m), "test::std::c3lang::ast");
     test::eq(m.kind, SymbolKind.MODULE);
-    test::eq(m.module_hash, (Fnv32a)fnv32a::encode("test::std::c3lang::ast"));
-    test::eq(m.hash, (Fnv32a)fnv32a::encode("test::std::c3lang::ast"));
+    test::eq(m.module_hash, (Fnv32a)fnv32a::hash("test::std::c3lang::ast"));
+    test::eq(m.hash, (Fnv32a)fnv32a::hash("test::std::c3lang::ast"));
 
     m = proj.modules.first("test::std::c3lang::best");
     test::eq(proj.modules.get_name(m), "test::std::c3lang::best");
     test::eq(m.kind, SymbolKind.MODULE);
-    test::eq(m.module_hash, (Fnv32a)fnv32a::encode("test::std::c3lang::best"));
-    test::eq(m.hash, (Fnv32a)fnv32a::encode("test::std::c3lang::best"));
+    test::eq(m.module_hash, (Fnv32a)fnv32a::hash("test::std::c3lang::best"));
+    test::eq(m.hash, (Fnv32a)fnv32a::hash("test::std::c3lang::best"));
 
     m = proj.modules.first("test::std::c3lang::cest");
     test::eq(proj.modules.get_name(m), "test::std::c3lang::cest");
     test::eq(m.kind, SymbolKind.MODULE);
-    test::eq(m.module_hash, (Fnv32a)fnv32a::encode("test::std::c3lang::cest"));
-    test::eq(m.hash, (Fnv32a)fnv32a::encode("test::std::c3lang::cest"));
+    test::eq(m.module_hash, (Fnv32a)fnv32a::hash("test::std::c3lang::cest"));
+    test::eq(m.hash, (Fnv32a)fnv32a::hash("test::std::c3lang::cest"));
 }
 
 fn void test_module_index_duplicates()
@@ -129,7 +129,7 @@ fn void test6(int a) => a * 2;
 
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
 
-    LspProject proj = LspProject.new_init("", "");
+    LspProject proj = project::new_lsp_project("", "");
     defer proj.free();
 
     proj.load_source(code, "foo.c3")!!;
@@ -148,8 +148,8 @@ fn void test6(int a) => a * 2;
     ) {
         test::eq(proj.modules.get_name(m), "test::std::c3lang::ast");
         test::eq(m.kind, SymbolKind.MODULE);
-        test::eq(m.module_hash, (Fnv32a)fnv32a::encode("test::std::c3lang::ast"));
-        test::eq(m.hash, (Fnv32a)fnv32a::encode("test::std::c3lang::ast"));
+        test::eq(m.module_hash, (Fnv32a)fnv32a::hash("test::std::c3lang::ast"));
+        test::eq(m.hash, (Fnv32a)fnv32a::hash("test::std::c3lang::ast"));
 
         n_collision++;
     }
