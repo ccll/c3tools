@@ -248,10 +248,10 @@ bang_expressions
 fn List{int}? foo() => 0;
 fn int[<2>]? foo() => 0;
 
-def TFoo = fn List{int}? foo();
-def TFoo = fn int[<3>]? foo();
-def TFoo = fn int? foo();
-def TFoo = fn int*? foo();
+alias TFoo = fn List{int}? foo();
+alias TFoo = fn int[<3>]? foo();
+alias TFoo = fn int? foo();
+alias TFoo = fn int*? foo();
 
 fn void? main() { 
     char? c = call();
@@ -270,10 +270,10 @@ fn void? main() {
 fn List{int}? foo() => 0;
 fn int[<2>]? foo() => 0;
 
-def TFoo = fn List{int}? foo();
-def TFoo = fn int[<3>]? foo();
-def TFoo = fn int? foo();
-def TFoo = fn int*? foo();
+alias TFoo = fn List{int}? foo();
+alias TFoo = fn int[<3>]? foo();
+alias TFoo = fn int? foo();
+alias TFoo = fn int*? foo();
 
 fn void? main()
 {

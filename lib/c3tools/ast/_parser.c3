@@ -438,9 +438,43 @@ fn bool Ast.parse_docstring(&ast, AstNode* node, Token* t, NodeParserState* stat
     return false;
 }
 
+fn bool Ast.parse_faultdef(&ast, AstNode* node, Token* t, NodeParserState* state)
+{
+    assert(node.type == FAULTDEF);
+    AstTypeDefEnumerable* node_typedef = (AstTypeDefEnumerable*)node;
+
+    switch STATE: (state.check(t)) {
+        case INVALID_TOKEN:
+            node_typedef.value = "";
+            state.transition(IDENT);
+        case IDENT:
+            switch (t.type) {
+                case CONST_IDENT:
+                    ast.@allc_add(AstNode, &node_typedef.values, t);
+                case AT_IDENT:
+                    ast.lexer.extend_current_attribute();
+                    ast.@allc_add(AstNode, &node_typedef.attributes, t);
+                case EOS:
+                    nextcase STATE: state.transition(EOF);
+                default:
+                    break;
+            }
+        case EOS:
+            nextcase STATE: state.transition(EOF);
+        case EOF:
+            ast.state_stack.remove_last();
+            node_typedef.iend = t.offset + t.value.len - 1;
+            return true;
+        default:
+            break;
+    }
+
+    return false;
+}
+
 fn bool Ast.parse_enumerable(&ast, AstNode* node, Token* t, NodeParserState* state)
 {
-    assert(node.type == ENUM || node.type == FAULT);
+    assert(node.type == ENUM);
     AstTypeDefEnumerable* node_enum = (AstTypeDefEnumerable*)node;
 
     switch STATE: (state.check(t)) {
@@ -801,7 +835,7 @@ fn bool Ast.parse_global_var(&ast, AstNode* node, Token* t, NodeParserState* sta
 
 fn bool Ast.parse_typedef(&ast, AstNode* node, Token* t, NodeParserState* state)
 {
-    assert(node.type == DEF || node.type == DISTINCT);
+    assert(node.type == ALIAS || node.type == TYPEDEF);
     AstTypeDef* node_typedef = (AstTypeDef*)node;
 
     switch STATE: (state.check(t)) {

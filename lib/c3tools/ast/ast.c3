@@ -24,15 +24,10 @@ struct NodeParserState
     TokenType last_token;
     TokenType current_token;
     TokenType initial_token;
+    uint initial_token_depth;
     AstNode* sub_node;
     uint scope_depth;
     TokenType[32] scope_stack;
-
-    // HACK: The new generics syntax List{int} brings some trouble in format_generic_statement().
-    // Now braces can appear in 'for/while' loop expressions, 'fn' return type and parameters,
-    // before the code scope braces.
-    // We track the initial token depth to resolve the ambiguity.
-    uint initial_token_depth;
 }
 
 struct AstNode
@@ -60,7 +55,7 @@ struct AstModule
 struct AstTypeDef
 {
     inline AstNode node;
-    AstModule* mod;  // module which owns the type def
+    AstModule* mod;  // module which owns the type alias
     AstNode* attributes;
     AstDoc* docs;
     AstNode* ftype;  // field or function return type
@@ -270,8 +265,13 @@ fn Ast parse(
                     docstring = null;  // reset all previous docs
                     node_fn = &Ast.parse_docstring;
                     node = self.@allc_add(AstDoc, &docstring, &self.lexer.token);
+                case FAULTDEF:
+                    node_fn = &Ast.parse_faultdef;
+                    node = self.@allc_add(
+                        AstTypeDefEnumerable, &current_module.decls, &self.lexer.token
+                    );
+                    ((AstTypeDefEnumerable*)node).docs = docstring;
                 case ENUM:
-                case FAULT:
                     node_fn = &Ast.parse_enumerable;
                     node = self.@allc_add(
                         AstTypeDefEnumerable, &current_module.decls, &self.lexer.token
@@ -291,8 +291,8 @@ fn Ast parse(
                         AstTypeDefStructural, &current_module.decls, &self.lexer.token
                     );
                     ((AstTypeDefStructural*)node).docs = docstring;
-                case DEF:
-                case DISTINCT:
+                case ALIAS:
+                case TYPEDEF:
                     node_fn = &Ast.parse_typedef;
                     node = self.@allc_add(AstTypeDef, &current_module.decls, &self.lexer.token);
                     ((AstTypeDef*)node).docs = docstring;

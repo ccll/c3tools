@@ -20,8 +20,9 @@ fn CodeFmtFn? CodeFmt.global_formatter_dispatch(CodeFmt* self, Token* t) @privat
         case UNION:
         case BITSTRUCT:
             return &CodeFmt.format_structural;
+        case FAULTDEF:
+            return &CodeFmt.format_faultdef;
         case ENUM:
-        case FAULT:
             return &CodeFmt.format_enumerable;
         case INTERFACE:
             return &CodeFmt.format_interface;
@@ -32,8 +33,8 @@ fn CodeFmtFn? CodeFmt.global_formatter_dispatch(CodeFmt* self, Token* t) @privat
             break;
         case EXTERN:
             return &CodeFmt.format_generic_extern;
-        case DEF:
-        case DISTINCT:
+        case ALIAS:
+        case TYPEDEF:
         case MODULE:
         case CONST:
         case IMPORT:
@@ -542,6 +543,10 @@ fn bool? CodeFmt.format_generic_statement(CodeFmt* self, Token* t, NodeParserSta
                     }
                     nextcase default;
                 case LBRACE:
+                    // HACK: The new generics syntax List{int} brings some trouble in statement formatting.
+                    // Now braces can appear in 'for/while' loop expressions, 'fn' return type and parameters,
+                    // before the code scope.
+
                     switch (state.initial_token) {
                         case DOT:
                             self.cache_statement_dump()!;
@@ -1434,7 +1439,49 @@ fn bool? CodeFmt.format_structural_scope(CodeFmt* self, Token* t, NodeParserStat
 }
 
 <*
- Formatter for enums, faults
+ Formatter for faults
+*>
+fn bool? CodeFmt.format_faultdef(CodeFmt* self, Token* t, NodeParserState* state) @private
+{
+    assert(t.type != EMPTY_LINE);
+
+    switch STATE: (state.check(t)) {
+        case INVALID_TOKEN:  // initial state
+            assert(t.type == FAULTDEF);
+            self.trace("ENTRY");
+            self.write("%s", t.value);
+            self.indent();
+            state.transition(IDENT);
+        case IDENT:  // fault names
+            self.trace("IDENT");
+            switch (t.type) {
+                case CONST_IDENT:
+                    self.newline();
+                    self.write("%s", t.value);
+                case COMMA:
+                    self.write("%s", t.value);
+                case AT_IDENT:  // attrs
+                    self._lexer.extend_current_attribute();
+                    self.newline();
+                    self.write("%s", t.value);
+                case EOS:
+                    self.write(";");
+                    state.transition(EOF);
+                default:
+                    break;
+            }
+        case EOF:
+            self.trace("EXIT");
+            self.dedent()!;
+            return true;
+        default:
+            unreachable();
+    }
+    return false;
+}
+
+<*
+ Formatter for enums
 *>
 fn bool? CodeFmt.format_enumerable(CodeFmt* self, Token* t, NodeParserState* state) @private
 {
@@ -1442,7 +1489,7 @@ fn bool? CodeFmt.format_enumerable(CodeFmt* self, Token* t, NodeParserState* sta
 
     switch STATE: (state.check(t)) {
         case INVALID_TOKEN:  // initial state
-            assert(t.type == ENUM || t.type == FAULT);
+            assert(t.type == ENUM);
             self.trace("ENTRY");
             self.write("%s", t.value);
             state.transition(TYPE_IDENT);

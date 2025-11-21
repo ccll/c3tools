@@ -1563,17 +1563,17 @@ enum TokenType : uint
     USZ,
     FLOAT128,
     ANY,
-    ANYFAULT,
+    FAULT,
     TYPEID,
 
     // Keywords
     ASSERT,
     ASM,
     STRUCT,
-    DEF,
-    DISTINCT,
+    ALIAS,
+    TYPEDEF,
     BITSTRUCT,
-    FAULT,
+    FAULTDEF,
     UNION,
     BREAK,
     CASE,
@@ -1881,8 +1881,8 @@ fn String token_type_to_string(TokenType type)
             return "DOC_COMMENT";
 
             // Keywords
-        case ANYFAULT:
-            return "anyfault";
+        case FAULT:
+            return "fault";
         case ASM:
             return "asm";
         case ASSERT:
@@ -1899,14 +1899,14 @@ fn String token_type_to_string(TokenType type)
             return "const";
         case CONTINUE:
             return "continue";
-        case DEF:
-            return "def";
+        case ALIAS:
+            return "alias";
         case DEFAULT:
             return "default";
         case DEFER:
             return "defer";
-        case DISTINCT:
-            return "distinct";
+        case TYPEDEF:
+            return "typedef";
         case DO:
             return "do";
         case ELSE:
@@ -1917,8 +1917,8 @@ fn String token_type_to_string(TokenType type)
             return "extern";
         case FALSE:
             return "false";
-        case FAULT:
-            return "fault";
+        case FAULTDEF:
+            return "faultdef";
         case FOR:
             return "for";
         case FOREACH:
@@ -2128,14 +2128,14 @@ fn TokenType token_from_identifier(String indentifier)
             return CONST;
         case "continue":
             return CONTINUE;
-        case "def":
-            return DEF;
+        case "alias":
+            return ALIAS;
         case "default":
             return DEFAULT;
         case "defer":
             return DEFER;
-        case "distinct":
-            return DISTINCT;
+        case "typedef":
+            return TYPEDEF;
         case "do":
             return DO;
         case "else":
@@ -2146,8 +2146,8 @@ fn TokenType token_from_identifier(String indentifier)
             return EXTERN;
         case "false":
             return FALSE;
-        case "fault":
-            return FAULT;
+        case "faultdef":
+            return FAULTDEF;
         case "for":
             return FOR;
         case "foreach":
@@ -2195,7 +2195,7 @@ fn TokenType token_from_identifier(String indentifier)
         case "tlocal":
             return TLOCAL;
             // Types
-        case "anyfault":
+        case "fault":
         case "var":
         case "void":
         case "any":
