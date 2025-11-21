@@ -541,6 +541,8 @@ fn bool? CodeFmt.format_generic_statement(CodeFmt* self, Token* t, NodeParserSta
                     }
                     nextcase default;
                 case LBRACE:
+                    // Is generics in fn arg list?.
+                    if (state.last_token == TYPE_IDENT) nextcase default;
                     switch (state.initial_token) {
                         case DOT:
                             self.cache_statement_dump()!;
@@ -567,8 +569,6 @@ fn bool? CodeFmt.format_generic_statement(CodeFmt* self, Token* t, NodeParserSta
                             self.write(" ");
                             return self.push_run_state(&CodeFmt.format_code_scope, t);
                         case FN:
-                            // Is generics in fn arg list?.
-                            if (state.last_token == TYPE_IDENT) break;
                             self.trace("fn foo() { inline enter");
                             self.cache_statement_dump()!;
                             self.write(" ");
@@ -613,6 +613,7 @@ fn bool? CodeFmt.format_generic_statement(CodeFmt* self, Token* t, NodeParserSta
                         case AT_IDENT:
                             if (state.scope_depth != 0) nextcase default;
                             self.trace("@body macro scope inline exit");
+                        case FN:
                         case DO:
                             self.trace("fn/do scope inline exit");
                             break;

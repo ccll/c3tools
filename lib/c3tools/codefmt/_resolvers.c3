@@ -307,11 +307,6 @@ fn bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* t) 
                 default:
                     nextcase TOP: default;
             }
-        case INTEGER:
-        case BOOL:
-            // integer and bool can be used as generic type parameter
-            if (prev_t == LBRACE && state.initial_token == TYPE_IDENT) { break; }
-            else { nextcase default; }
         default:
             if (self._resolve_default_space(state, t)) pre_space = true;
     }
@@ -893,7 +888,7 @@ fn TokenType CodeFmt._resolve__next_token(&self, usz current_idx) @private
 <*
  Checks if we need a white space before ?
 *>
-fn bool CodeFmt._resolve__next_question_is_error(&self, usz current_idx) @private
+fn bool CodeFmt._resolve__question_prespace(&self, usz current_idx) @private
 {
     // Resolves ambiguity
     // foo ? bar : baz;
@@ -908,6 +903,7 @@ fn bool CodeFmt._resolve__next_question_is_error(&self, usz current_idx) @privat
         case RVEC:
         case STAR:
         case RBRACE:
+            // No pre-space if previous expression is a type (array, vector, pointer, generic type).
             return false;
         default:
             break;
@@ -937,15 +933,6 @@ fn bool CodeFmt._resolve__next_question_is_error(&self, usz current_idx) @privat
     return true;
 }
 
-fn isz CodeFmt.__locate_prev_token(&self, TokenType type) @private
-{
-    isz idx = (isz)self.__token_cache.len();
-    while (--idx >= 0) {
-        if (self.__token_cache[idx].type == type) return idx;
-    }
-    return -1;
-}
-
 fn isz CodeFmt.__locate_matching_lbrace(&self) @private
 {
     isz scope_depth = 1;
@@ -962,7 +949,7 @@ fn isz CodeFmt.__locate_matching_lbrace(&self) @private
 }
 
 <*
- Determine if a space should add before RBRACE.
+ Determine if a space should add before '}'.
 *>
 fn bool CodeFmt._resolve__rbrace_prespace(&self) @private
 {
@@ -972,7 +959,8 @@ fn bool CodeFmt._resolve__rbrace_prespace(&self) @private
     isz lbrace = self.__locate_matching_lbrace();
     if (lbrace == -1) return false;
 
-    // Make it symetric with LBRACE.
+    // We take a shortcut to make thing easier.
+    // Since the LBRACE is properly formatted already, we just mirror the space after it.
     return self.__token_cache[lbrace+1].type == SPACE
         && self.__token_cache[^1].type != SPACE;
 }
