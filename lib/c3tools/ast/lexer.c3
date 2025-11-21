@@ -1563,7 +1563,7 @@ enum TokenType : uint
     USZ,
     FLOAT128,
     ANY,
-    ANYFAULT,
+    FAULT,
     TYPEID,
 
     // Keywords
@@ -1881,8 +1881,8 @@ fn String token_type_to_string(TokenType type)
             return "DOC_COMMENT";
 
             // Keywords
-        case ANYFAULT:
-            return "anyfault";
+        case FAULT:
+            return "fault";
         case ASM:
             return "asm";
         case ASSERT:
@@ -2195,7 +2195,7 @@ fn TokenType token_from_identifier(String indentifier)
         case "tlocal":
             return TLOCAL;
             // Types
-        case "anyfault":
+        case "fault":
         case "var":
         case "void":
         case "any":

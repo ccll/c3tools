@@ -365,14 +365,14 @@ fn typeid main(typeid t)
     return;
 }
 ================================================================================
-any_anyfault
+any_fault
 ================================================================================
 
 macro any
 main(any foo) { return;}
 
-macro anyfault
-main(anyfault foo) { return;}
+macro fault
+main(fault foo) { return;}
 
 --------------------------------------------------------------------------------
 macro any main(any foo)
@@ -380,7 +380,7 @@ macro any main(any foo)
     return;
 }
 
-macro anyfault main(anyfault foo)
+macro fault main(fault foo)
 {
     return;
 }
