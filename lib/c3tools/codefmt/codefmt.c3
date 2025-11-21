@@ -23,6 +23,9 @@ struct CodeFmt
     bool _is_inline_comment;
     bool _is_cascade_call;
     bool _skip_next_new_line;
+
+    // Track if the last stack is for generics type list
+    bool _is_generic_list;
 }
 
 <*
