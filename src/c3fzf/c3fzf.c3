@@ -224,7 +224,7 @@ macro print_nodes(format, ast_nodes, String sep = "")
     }
 }
 
-fn void print_decl_def(AstTypeDef* d, bool is_full_preview)
+fn void print_decl_alias(AstTypeDef* d, bool is_full_preview)
 {
     assert(d.type == TokenType.ALIAS);
 
@@ -233,11 +233,11 @@ fn void print_decl_def(AstTypeDef* d, bool is_full_preview)
     io::printfn(";");
 }
 
-fn void print_decl_distinct(AstTypeDef* d, bool is_full_preview)
+fn void print_decl_typedef(AstTypeDef* d, bool is_full_preview)
 {
-    assert(d.type == TokenType.DISTINCT);
+    assert(d.type == TokenType.TYPEDEF);
 
-    io::printf("distinct %s = ", d.value);
+    io::printf("typedef %s = ", d.value);
     print_nodes("%s", d.ftype);
     io::printfn(";");
 }
@@ -431,9 +431,9 @@ fn void? print_preview(
 
         switch (d.decl.type) {
             case ALIAS:
-                print_decl_def((AstTypeDef*)d.decl, is_full_preview);
-            case DISTINCT:
-                print_decl_distinct((AstTypeDef*)d.decl, is_full_preview);
+                print_decl_alias((AstTypeDef*)d.decl, is_full_preview);
+            case TYPEDEF:
+                print_decl_typedef((AstTypeDef*)d.decl, is_full_preview);
             case ENUM:
             case FAULT:
                 print_decl_enum((AstTypeDefEnumerable*)d.decl, is_full_preview);
@@ -489,11 +489,11 @@ fn int cmp_decl(ModuleDecl a, ModuleDecl b) @private
             }
         case STRUCT:
         case ALIAS:
-        case DISTINCT:
+        case TYPEDEF:
             switch (b.decl.type) {
                 case STRUCT:
                 case ALIAS:
-                case DISTINCT:
+                case TYPEDEF:
                     is_comparable_type = true;
                 default:
                     break;

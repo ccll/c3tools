@@ -287,7 +287,7 @@ fn Ast parse(
                     );
                     ((AstTypeDefStructural*)node).docs = docstring;
                 case ALIAS:
-                case DISTINCT:
+                case TYPEDEF:
                     node_fn = &Ast.parse_typedef;
                     node = self.@allc_add(AstTypeDef, &current_module.decls, &self.lexer.token);
                     ((AstTypeDef*)node).docs = docstring;

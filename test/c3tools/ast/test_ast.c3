@@ -2125,11 +2125,11 @@ alias IntList32 @test @foo = inline List{int};
     test::eq(struct_type.iend, code.len - 4);
 }
 
-fn void test_distinct()
+fn void test_typedef()
 {
     String code = `module test::std::c3lang::ast;
-<*def doc*>
-distinct Int32 = int;
+<*typedef doc*>
+typedef Int32 = int;
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
     DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
@@ -2143,18 +2143,18 @@ distinct Int32 = int;
     AstTypeDefStructural* struct_type = (AstTypeDefStructural*)ast.@node_at(m.decls, 0);
     test::ne(struct_type, null);
 
-    test::eq(struct_type.type, TokenType.DISTINCT);
+    test::eq(struct_type.type, TokenType.TYPEDEF);
     test::eq(struct_type.value, "Int32");
 
     test::eq(ast.@node_join(struct_type.attributes, contents), "");
-    test::eq(ast.@node_join(struct_type.docs, contents), "<*def doc");
+    test::eq(ast.@node_join(struct_type.docs, contents), "<*typedef doc");
     test::eq(ast.@node_join(struct_type.ftype, contents), "int");
 
     io::printf(
         "\n\n``%s``",
         code[struct_type.istart .. math::min((isz)struct_type.iend, (isz)(code.len - 1))]
     );
-    test::eq(struct_type.istart, 43);
+    test::eq(struct_type.istart, 47);
     test::eq(code[struct_type.iend], ';');
     test::eq(struct_type.iend, code.len - 4);
 }

@@ -1571,7 +1571,7 @@ enum TokenType : uint
     ASM,
     STRUCT,
     ALIAS,
-    DISTINCT,
+    TYPEDEF,
     BITSTRUCT,
     FAULT,
     UNION,
@@ -1905,8 +1905,8 @@ fn String token_type_to_string(TokenType type)
             return "default";
         case DEFER:
             return "defer";
-        case DISTINCT:
-            return "distinct";
+        case TYPEDEF:
+            return "typedef";
         case DO:
             return "do";
         case ELSE:
@@ -2134,8 +2134,8 @@ fn TokenType token_from_identifier(String indentifier)
             return DEFAULT;
         case "defer":
             return DEFER;
-        case "distinct":
-            return DISTINCT;
+        case "typedef":
+            return TYPEDEF;
         case "do":
             return DO;
         case "else":

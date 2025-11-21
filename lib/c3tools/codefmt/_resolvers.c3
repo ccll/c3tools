@@ -399,7 +399,7 @@ macro bool CodeFmt._resolve_default_space(&self, NodeParserState* state, Token* 
         case NEXTCASE:
         case INLINE:
         case TYPEID:
-        case DISTINCT:
+        case TYPEDEF:
         case BREAK:
         case CONTINUE:
         case RVEC:
