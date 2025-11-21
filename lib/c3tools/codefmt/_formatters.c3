@@ -539,14 +539,9 @@ fn bool? CodeFmt.format_generic_statement(CodeFmt* self, Token* t, NodeParserSta
                         break;
                     } else {
                         state.initial_token = t.type;
-                        state.initial_token_depth = state.scope_depth;
                     }
                     nextcase default;
                 case LBRACE:
-                    // HACK: The new generics syntax List{int} brings some trouble in statement formatting.
-                    // Now braces can appear in 'for/while' loop expressions, 'fn' return type and parameters,
-                    // before the code scope.
-
                     switch (state.initial_token) {
                         case DOT:
                             self.cache_statement_dump()!;
@@ -574,7 +569,7 @@ fn bool? CodeFmt.format_generic_statement(CodeFmt* self, Token* t, NodeParserSta
                             return self.push_run_state(&CodeFmt.format_code_scope, t);
                         case FN:
                             // distinguish `foo(List{int} x) {...}` and `foo() { ... }`
-                            if (state.initial_token_depth != state.scope_depth) nextcase default;
+                            if (state.last_token == TYPE_IDENT) nextcase default;
                             self.trace("fn foo() { inline enter");
                             self.cache_statement_dump()!;
                             self.write(" ");
@@ -596,7 +591,6 @@ fn bool? CodeFmt.format_generic_statement(CodeFmt* self, Token* t, NodeParserSta
                                     // mem::@scoped(&allocator){ @body(); };
                                     self.trace("MACRO @body");
                                     state.initial_token = FOR;
-                                    state.initial_token_depth = state.scope_depth;
                                     nextcase FOR;
                                 } else {
                                     self.trace("struct/array cast {}");
@@ -621,8 +615,10 @@ fn bool? CodeFmt.format_generic_statement(CodeFmt* self, Token* t, NodeParserSta
                             if (state.scope_depth != 0) nextcase default;
                             self.trace("@body macro scope inline exit");
                         case FN:
-                            if (state.initial_token_depth != state.scope_depth) { break; }
-                            else { nextcase default; }
+                            // TODO: use new format_generic_type_list()
+                            // if (state.last != state.scope_depth) { break; }
+                            // else { nextcase default; }
+                            break;
                         case DO:
                             self.trace("fn/do scope inline exit");
                             break;
@@ -1404,9 +1400,13 @@ fn bool? CodeFmt.format_structural_scope(CodeFmt* self, Token* t, NodeParserStat
             self.trace("SCOPE");
             switch (t.type) {
                 case LBRACE:
-                    if (state.last_token == TYPE_IDENT) {
+                    if (state.scope_depth > 1 && state.last_token == TYPE_IDENT) {
+                        // is generic type list
+                        self._is_generic_list = true;
                         self.cache_statement_dump()!;
                         return self.push_run_state(&CodeFmt.format_generic_type_list, t);
+                    } else {
+                        self._is_generic_list = false;
                     }
                 case RBRACE:
                     if (state.scope_depth == 0) {
@@ -1435,8 +1435,10 @@ fn bool? CodeFmt.format_structural_scope(CodeFmt* self, Token* t, NodeParserStat
                 case DOCS_END:
                     break;
                 default:
-                    if (state.last_token == LBRACE) {
-                        self.newline();
+                    // self.write(" %s ", self._is_generic_list);
+                    self.write("");
+                    if (self.cache_statement_len() == 0 && !self._is_generic_list  ) {
+                        self.newline(is_empty: true);
                     }
                     self.cache_statement_add(state, t);
             }
