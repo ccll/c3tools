@@ -11,7 +11,7 @@ import std::collections::list;
 <*
  Decides if we need insert space before current token
 *>
-fn bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* t) @private
+macro bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* t) @private
 {
     usz cache_len = self.cache_statement_len();
     TokenType prev_t = cache_len > 0 ? self.__token_cache[^1].type : TokenType.INVALID_TOKEN;
@@ -319,7 +319,7 @@ fn bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* t) 
 <*
  Check if previous token type requires a space after it (in general case)
 *>
-fn bool CodeFmt._resolve_default_space(&self, NodeParserState* state, Token* t) @private
+macro bool CodeFmt._resolve_default_space(&self, NodeParserState* state, Token* t) @private
 {
     switch (state.last_token) {
         case QUESTION:
