@@ -265,8 +265,13 @@ fn Ast parse(
                     docstring = null;  // reset all previous docs
                     node_fn = &Ast.parse_docstring;
                     node = self.@allc_add(AstDoc, &docstring, &self.lexer.token);
+                case FAULTDEF:
+                    node_fn = &Ast.parse_faultdef;
+                    node = self.@allc_add(
+                        AstTypeDefEnumerable, &current_module.decls, &self.lexer.token
+                    );
+                    ((AstTypeDefEnumerable*)node).docs = docstring;
                 case ENUM:
-                case FAULT:
                     node_fn = &Ast.parse_enumerable;
                     node = self.@allc_add(
                         AstTypeDefEnumerable, &current_module.decls, &self.lexer.token

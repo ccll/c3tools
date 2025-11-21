@@ -1573,7 +1573,7 @@ enum TokenType : uint
     ALIAS,
     TYPEDEF,
     BITSTRUCT,
-    FAULT,
+    FAULTDEF,
     UNION,
     BREAK,
     CASE,
@@ -1917,8 +1917,8 @@ fn String token_type_to_string(TokenType type)
             return "extern";
         case FALSE:
             return "false";
-        case FAULT:
-            return "fault";
+        case FAULTDEF:
+            return "faultdef";
         case FOR:
             return "for";
         case FOREACH:
@@ -2146,8 +2146,8 @@ fn TokenType token_from_identifier(String indentifier)
             return EXTERN;
         case "false":
             return FALSE;
-        case "fault":
-            return FAULT;
+        case "faultdef":
+            return FAULTDEF;
         case "for":
             return FOR;
         case "foreach":

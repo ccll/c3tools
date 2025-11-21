@@ -1082,15 +1082,15 @@ enum Foo : int (String desc, bool active, Position pos) @test @if(env:FOO) {
     test::eq(enum_type.iend, code.len - 4);
 }
 
-fn void test_fault_type()
+fn void test_faultdef_parser()
 {
     String code = `module test::std::c3lang::ast;
-fault SomeFault @local @if(env::FOO)
-{
+faultdef
     A,
-    RUNNING    = { OtherEnum.FAILING, true,  {12,22} },
-    FOO = SOME_OTHER_CONST,
-}
+    RUNNING,
+    FOO
+    @local @if(env::FOO)
+    ;
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
     DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
@@ -1101,35 +1101,34 @@ fault SomeFault @local @if(env::FOO)
     AstModule* m = ast.@node_at(ast.modules, 0);
     test::ne(m, null);
 
-    AstTypeDefEnumerable* enum_type = (AstTypeDefEnumerable*)ast.@node_at(m.decls, 0);
-    test::ne(enum_type, null);
+    AstTypeDefEnumerable* fault_type = (AstTypeDefEnumerable*)ast.@node_at(m.decls, 0);
+    test::ne(fault_type, null);
 
-    test::eq(enum_type.type, TokenType.FAULT);
-    test::eq(enum_type.value, "SomeFault");
+    test::eq(fault_type.type, TokenType.FAULTDEF);
 
-    test::eq(ast.@node_join(enum_type.attributes, contents), "@local,@if(env::FOO)");
+    test::eq(ast.@node_join(fault_type.attributes, contents), "@local,@if(env::FOO)");
 
-    test::eq(ast.@node_len(enum_type.values), 3);
+    test::eq(ast.@node_len(fault_type.values), 3);
     AstNode* eval;
 
-    eval = ast.@node_at(enum_type.values, 0);
+    eval = ast.@node_at(fault_type.values, 0);
     test::eq(eval.type, TokenType.CONST_IDENT);
     test::eq(eval.value, "A");
 
-    eval = ast.@node_at(enum_type.values, 1);
+    eval = ast.@node_at(fault_type.values, 1);
     test::eq(eval.type, TokenType.CONST_IDENT);
     test::eq(eval.value, "RUNNING");
 
-    eval = ast.@node_at(enum_type.values, 2);
+    eval = ast.@node_at(fault_type.values, 2);
     test::eq(eval.type, TokenType.CONST_IDENT);
     test::eq(eval.value, "FOO");
 
     io::printf(
-        "\n\n``%s``", code[enum_type.istart .. math::min((isz)enum_type.iend, (isz)(code.len - 1))]
+        "\n\n``%s``", code[fault_type.istart .. math::min((isz)fault_type.iend, (isz)(code.len - 1))]
     );
-    test::eq(enum_type.istart, 31);
-    test::eq(code[enum_type.iend], '}');
-    test::eq(enum_type.iend, code.len - 4);
+    test::eq(fault_type.istart, 31);
+    test::eq(code[fault_type.iend], ';');
+    test::eq(fault_type.iend, code.len - 4);
 }
 
 fn void test_interface_type()

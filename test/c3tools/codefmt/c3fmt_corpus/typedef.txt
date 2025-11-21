@@ -198,20 +198,17 @@ enum State : int @if("foo") (String desc, bool active, Position pos) @test
     TERMINATED = { "ended", false, {0, 0} },
 }
 ================================================================================
-fault_simple
+faultdef_simple
 ================================================================================
-fault Err
-{
-    OOPS, OOPS_WITH_COMMENT,   // this is an oops
-    LOTS_OF_OOPS
-}
+faultdef OOPS, OOPS_WITH_COMMENT,   // this is an oops
+    LOTS_OF_OOPS @local @if(env::FOO);
 --------------------------------------------------------------------------------
-fault Err
-{
+faultdef
     OOPS,
     OOPS_WITH_COMMENT,  // this is an oops
     LOTS_OF_OOPS
-}
+    @local
+    @if(env::FOO);
 ================================================================================
 def_statement_global
 ================================================================================
