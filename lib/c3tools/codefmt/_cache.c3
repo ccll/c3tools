@@ -96,12 +96,40 @@ fn void? CodeFmt.cache_statement_dump(
     );
 
     if (no_split || (!has_magic_comma && self._line_used + token_len <= self.max_line_width)) {
+        // Track generic braces.
+        isz brace_depth = -1;
+        List{bool} brace_is_generic;
+        brace_is_generic.init(tmem);
+        defer brace_is_generic.free();
+
         // NOTE: Fits in line no wrapping needed write as is with standard formatting.
         self.@cache_statement_iter(; usz i, Token* t) {
             if (self._print_lex) io::eprintf("%s ", t.type);
             switch (t.type) {
                 case QUESTION:
-                    if (self._resolve__next_question_is_error(i)) self.write(" ");
+                    if (self._resolve__question_prespace(i)) self.write(" ");
+                    nextcase default;
+                case LBRACE:
+                    brace_is_generic.push(self._resolve__prev_token(i, 1) == TYPE_IDENT);
+                    ++brace_depth;
+                    nextcase default;
+                case RBRACE:
+                    (void)brace_is_generic.pop();
+                    --brace_depth;
+                    nextcase default;
+                case SPACE:
+                    // In generic type expression, spaces immediately after '{' and before '}' are skipped.
+                    if (brace_depth < 0) nextcase default;
+                    if (brace_depth >= brace_is_generic.len()) nextcase default;
+                    if (self._resolve__prev_token(i, 1) == LBRACE
+                        && brace_is_generic[brace_depth])
+                    {
+                        break;
+                    } else if (self._resolve__next_token(i) == RBRACE
+                        && brace_is_generic[brace_depth])
+                    {
+                        break;
+                    }
                     nextcase default;
                 default:
                     self.write("%s", t.value);
@@ -161,7 +189,7 @@ macro void? CodeFmt.cache_statement_dump_struct_init(&self, bool is_multiline, T
                 self.write("  %s", t.value);
                 tmpstate.current_token = tmpstate.last_token;
             case QUESTION:
-                if (self._resolve__next_question_is_error(i)) self.write(" ");
+                if (self._resolve__question_prespace(i)) self.write(" ");
                 nextcase default;
             case SPACE:
                 if (is_multiline) {
@@ -256,7 +284,7 @@ macro void? CodeFmt.cache_statement_dump_generic(&self, bool is_multiline, Token
                 case COMMENT_MULTI_INLINE:
                     self.write("  %s", t.value);
                 case QUESTION:
-                    if (self._resolve__next_question_is_error(i)) self.write(" ");
+                    if (self._resolve__question_prespace(i)) self.write(" ");
                     nextcase default;
                 default:
                     if (is_multiline) {

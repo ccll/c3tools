@@ -538,11 +538,14 @@ fn bool? CodeFmt.format_generic_statement(CodeFmt* self, Token* t, NodeParserSta
                         break;
                     } else {
                         state.initial_token = t.type;
+                        state.initial_token_depth = state.scope_depth;
                     }
                     nextcase default;
                 case LBRACE:
-                    // Is generics in fn arg list?.
-                    if (state.last_token == TYPE_IDENT) nextcase default;
+                    // HACK: The new generics syntax List{int} brings some trouble in statement formatting.
+                    // Now braces can appear in 'for/while' loop expressions, 'fn' return type and parameters,
+                    // before the code scope.
+
                     switch (state.initial_token) {
                         case DOT:
                             self.cache_statement_dump()!;
@@ -569,6 +572,8 @@ fn bool? CodeFmt.format_generic_statement(CodeFmt* self, Token* t, NodeParserSta
                             self.write(" ");
                             return self.push_run_state(&CodeFmt.format_code_scope, t);
                         case FN:
+                            // distinguish `foo(List{int} x) {...}` and `foo() { ... }`
+                            if (state.initial_token_depth != state.scope_depth) nextcase default;
                             self.trace("fn foo() { inline enter");
                             self.cache_statement_dump()!;
                             self.write(" ");
@@ -590,6 +595,7 @@ fn bool? CodeFmt.format_generic_statement(CodeFmt* self, Token* t, NodeParserSta
                                     // mem::@scoped(&allocator){ @body(); };
                                     self.trace("MACRO @body");
                                     state.initial_token = FOR;
+                                    state.initial_token_depth = state.scope_depth;
                                     nextcase FOR;
                                 } else {
                                     self.trace("struct/array cast {}");
@@ -614,6 +620,8 @@ fn bool? CodeFmt.format_generic_statement(CodeFmt* self, Token* t, NodeParserSta
                             if (state.scope_depth != 0) nextcase default;
                             self.trace("@body macro scope inline exit");
                         case FN:
+                            if (state.initial_token_depth != state.scope_depth) { break; }
+                            else { nextcase default; }
                         case DO:
                             self.trace("fn/do scope inline exit");
                             break;

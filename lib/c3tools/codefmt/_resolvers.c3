@@ -215,6 +215,8 @@ fn bool CodeFmt._resolve_current_token(&self, NodeParserState* state, Token* t) 
         case RPAREN:
             break;
         case RBRACE:
+            // HACK: generic type related braces are handled in dump func.
+
             // array related brace
             switch (prev_t) {
                 case LBRACE:
