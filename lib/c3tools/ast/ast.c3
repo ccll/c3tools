@@ -55,7 +55,7 @@ struct AstModule
 struct AstTypeDef
 {
     inline AstNode node;
-    AstModule* mod;  // module which owns the type def
+    AstModule* mod;  // module which owns the type alias
     AstNode* attributes;
     AstDoc* docs;
     AstNode* ftype;  // field or function return type
@@ -286,7 +286,7 @@ fn Ast parse(
                         AstTypeDefStructural, &current_module.decls, &self.lexer.token
                     );
                     ((AstTypeDefStructural*)node).docs = docstring;
-                case DEF:
+                case ALIAS:
                 case DISTINCT:
                     node_fn = &Ast.parse_typedef;
                     node = self.@allc_add(AstTypeDef, &current_module.decls, &self.lexer.token);

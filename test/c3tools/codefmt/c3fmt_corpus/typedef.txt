@@ -215,33 +215,33 @@ fault Err
 ================================================================================
 def_statement_global
 ================================================================================
-def EnumSetType = $typefrom(private::type_for_enum_elements(Enum.elements)) @private;
-def ElementTest = fn bool(Type *type, any context);
-def TestFailFn = fn void? (bool to_fail);
-def FormatTzTestSpec = Triple{TzDateTime, DateTimeFormat, String};
-def IntList = ElasticArray{int, 10};
-def BenchmarkFn = fn void?(int) @if($$OLD_TEST);
-def @Align(y) = { @Align16(y / 2) };
-def @Test = { @noinline };
+alias EnumSetType = $typefrom(private::type_for_enum_elements(Enum.elements)) @private;
+alias ElementTest = fn bool(Type *type, any context);
+alias TestFailFn = fn void? (bool to_fail);
+alias FormatTzTestSpec = Triple{TzDateTime, DateTimeFormat, String};
+alias IntList = ElasticArray{int, 10};
+alias BenchmarkFn = fn void?(int) @if($$OLD_TEST);
+alias @Align(y) = { @Align16(y / 2) };
+alias @Test = { @noinline };
 --------------------------------------------------------------------------------
-def EnumSetType = $typefrom(
+alias EnumSetType = $typefrom(
     private::type_for_enum_elements(Enum.elements)
 ) @private;
-def ElementTest = fn bool (Type* type, any context);
-def TestFailFn = fn void? (bool to_fail);
-def FormatTzTestSpec = Triple{TzDateTime, DateTimeFormat, String};
-def IntList = ElasticArray{int, 10};
-def BenchmarkFn = fn void? (int) @if($$OLD_TEST);
-def @Align(y) = { @Align16(y / 2) };
-def @Test = { @noinline };
+alias ElementTest = fn bool (Type* type, any context);
+alias TestFailFn = fn void? (bool to_fail);
+alias FormatTzTestSpec = Triple{TzDateTime, DateTimeFormat, String};
+alias IntList = ElasticArray{int, 10};
+alias BenchmarkFn = fn void? (int) @if($$OLD_TEST);
+alias @Align(y) = { @Align16(y / 2) };
+alias @Test = { @noinline };
 ================================================================================
 optional_return_type
 ================================================================================
-def TestFailFn = fn void ? (bool to_fail);
-def BenchmarkFn = fn void?(int) @if($$OLD_TEST);
+alias TestFailFn = fn void ? (bool to_fail);
+alias BenchmarkFn = fn void?(int) @if($$OLD_TEST);
 --------------------------------------------------------------------------------
-def TestFailFn = fn void? (bool to_fail);
-def BenchmarkFn = fn void? (int) @if($$OLD_TEST);
+alias TestFailFn = fn void? (bool to_fail);
+alias BenchmarkFn = fn void? (int) @if($$OLD_TEST);
 ================================================================================
 def_interface
 ================================================================================
@@ -326,7 +326,7 @@ struct ReflectedParam (Printable) @if(!$defined(ReflectedParam))
     String name;
     typeid type;
 }
-def Time_t = $typefrom(env::WIN32 ? long.typeid : CLong.typeid);
+alias Time_t = $typefrom(env::WIN32 ? long.typeid : CLong.typeid);
 
 macro bool @typeis(#value, $Type) @const @builtin => $typeof(#value).typeid == $Type.typeid;
 
@@ -351,7 +351,7 @@ struct ReflectedParam (Printable) @if(!$defined(ReflectedParam))
     typeid type;
 }
 
-def Time_t = $typefrom(env::WIN32 ? long.typeid : CLong.typeid);
+alias Time_t = $typefrom(env::WIN32 ? long.typeid : CLong.typeid);
 
 macro bool @typeis(#value, $Type) @const @builtin => $typeof(#value).typeid == $Type.typeid;
 

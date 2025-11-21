@@ -801,7 +801,7 @@ fn bool Ast.parse_global_var(&ast, AstNode* node, Token* t, NodeParserState* sta
 
 fn bool Ast.parse_typedef(&ast, AstNode* node, Token* t, NodeParserState* state)
 {
-    assert(node.type == DEF || node.type == DISTINCT);
+    assert(node.type == ALIAS || node.type == DISTINCT);
     AstTypeDef* node_typedef = (AstTypeDef*)node;
 
     switch STATE: (state.check(t)) {

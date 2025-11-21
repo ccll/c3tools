@@ -32,7 +32,7 @@ fn CodeFmtFn? CodeFmt.global_formatter_dispatch(CodeFmt* self, Token* t) @privat
             break;
         case EXTERN:
             return &CodeFmt.format_generic_extern;
-        case DEF:
+        case ALIAS:
         case DISTINCT:
         case MODULE:
         case CONST:

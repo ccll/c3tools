@@ -1570,7 +1570,7 @@ enum TokenType : uint
     ASSERT,
     ASM,
     STRUCT,
-    DEF,
+    ALIAS,
     DISTINCT,
     BITSTRUCT,
     FAULT,
@@ -1899,8 +1899,8 @@ fn String token_type_to_string(TokenType type)
             return "const";
         case CONTINUE:
             return "continue";
-        case DEF:
-            return "def";
+        case ALIAS:
+            return "alias";
         case DEFAULT:
             return "default";
         case DEFER:
@@ -2128,8 +2128,8 @@ fn TokenType token_from_identifier(String indentifier)
             return CONST;
         case "continue":
             return CONTINUE;
-        case "def":
-            return DEF;
+        case "alias":
+            return ALIAS;
         case "default":
             return DEFAULT;
         case "defer":

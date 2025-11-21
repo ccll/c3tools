@@ -1988,11 +1988,11 @@ struct MyBit {
     test::eq(struct_type.iend, code.len - 4);
 }
 
-fn void test_def()
+fn void test_alias()
 {
     String code = `module test::std::c3lang::ast;
-<*def doc*>
-def Int32 = int;
+<*alias doc*>
+alias Int32 = int;
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
     DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
@@ -2006,27 +2006,27 @@ def Int32 = int;
     AstTypeDefStructural* struct_type = (AstTypeDefStructural*)ast.@node_at(m.decls, 0);
     test::ne(struct_type, null);
 
-    test::eq(struct_type.type, TokenType.DEF);
+    test::eq(struct_type.type, TokenType.ALIAS);
     test::eq(struct_type.value, "Int32");
 
     test::eq(ast.@node_join(struct_type.attributes, contents), "");
-    test::eq(ast.@node_join(struct_type.docs, contents), "<*def doc");
+    test::eq(ast.@node_join(struct_type.docs, contents), "<*alias doc");
     test::eq(ast.@node_join(struct_type.ftype, contents), "int");
 
     io::printf(
         "\n\n``%s``",
         code[struct_type.istart .. math::min((isz)struct_type.iend, (isz)(code.len - 1))]
     );
-    test::eq(struct_type.istart, 43);
+    test::eq(struct_type.istart, 45);
     test::eq(code[struct_type.iend], ';');
     test::eq(struct_type.iend, code.len - 4);
 }
 
-fn void test_def_const()
+fn void test_alias_const()
 {
     String code = `module test::std::c3lang::ast;
-<*def doc*>
-def MY_CONST = int;
+<*alias doc*>
+alias MY_CONST = int;
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
     DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
@@ -2040,27 +2040,27 @@ def MY_CONST = int;
     AstTypeDefStructural* struct_type = (AstTypeDefStructural*)ast.@node_at(m.decls, 0);
     test::ne(struct_type, null);
 
-    test::eq(struct_type.type, TokenType.DEF);
+    test::eq(struct_type.type, TokenType.ALIAS);
     test::eq(struct_type.value, "MY_CONST");
 
     test::eq(ast.@node_join(struct_type.attributes, contents), "");
-    test::eq(ast.@node_join(struct_type.docs, contents), "<*def doc");
+    test::eq(ast.@node_join(struct_type.docs, contents), "<*alias doc");
     test::eq(ast.@node_join(struct_type.ftype, contents), "int");
 
     io::printf(
         "\n\n``%s``",
         code[struct_type.istart .. math::min((isz)struct_type.iend, (isz)(code.len - 1))]
     );
-    test::eq(struct_type.istart, 43);
+    test::eq(struct_type.istart, 45);
     test::eq(code[struct_type.iend], ';');
     test::eq(struct_type.iend, code.len - 4);
 }
 
-fn void test_def_attr_type()
+fn void test_alias_attr_type()
 {
     String code = `module test::std::c3lang::ast;
-<*def doc*>
-def @Int32 = { @foo @bar };
+<*alias doc*>
+alias @Int32 = { @foo @bar };
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
     DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
@@ -2074,27 +2074,27 @@ def @Int32 = { @foo @bar };
     AstTypeDefStructural* struct_type = (AstTypeDefStructural*)ast.@node_at(m.decls, 0);
     test::ne(struct_type, null);
 
-    test::eq(struct_type.type, TokenType.DEF);
+    test::eq(struct_type.type, TokenType.ALIAS);
     test::eq(struct_type.value, "@Int32");
 
     test::eq(ast.@node_join(struct_type.attributes, contents), "");
-    test::eq(ast.@node_join(struct_type.docs, contents), "<*def doc");
+    test::eq(ast.@node_join(struct_type.docs, contents), "<*alias doc");
     test::eq(ast.@node_join(struct_type.ftype, contents), "{,@foo,@bar,}");
 
     io::printf(
         "\n\n``%s``",
         code[struct_type.istart .. math::min((isz)struct_type.iend, (isz)(code.len - 1))]
     );
-    test::eq(struct_type.istart, 43);
+    test::eq(struct_type.istart, 45);
     test::eq(code[struct_type.iend], ';');
     test::eq(struct_type.iend, code.len - 4);
 }
 
-fn void test_def_inline_list()
+fn void test_alias_inline_list()
 {
     String code = `module test::std::c3lang::ast;
-<*def doc*>
-def IntList32 @test @foo = inline List{int};
+<*alias doc*>
+alias IntList32 @test @foo = inline List{int};
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
     DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
@@ -2108,11 +2108,11 @@ def IntList32 @test @foo = inline List{int};
     AstTypeDefStructural* struct_type = (AstTypeDefStructural*)ast.@node_at(m.decls, 0);
     test::ne(struct_type, null);
 
-    test::eq(struct_type.type, TokenType.DEF);
+    test::eq(struct_type.type, TokenType.ALIAS);
     test::eq(struct_type.value, "IntList32");
 
     test::eq(ast.@node_join(struct_type.attributes, contents), "@test,@foo");
-    test::eq(ast.@node_join(struct_type.docs, contents), "<*def doc");
+    test::eq(ast.@node_join(struct_type.docs, contents), "<*alias doc");
     // NOTE: inline expected to be excluded from type fields
     test::eq(ast.@node_join(struct_type.ftype, contents), "List,{,int,}");
 
@@ -2120,7 +2120,7 @@ def IntList32 @test @foo = inline List{int};
         "\n\n``%s``",
         code[struct_type.istart .. math::min((isz)struct_type.iend, (isz)(code.len - 1))]
     );
-    test::eq(struct_type.istart, 43);
+    test::eq(struct_type.istart, 45);
     test::eq(code[struct_type.iend], ';');
     test::eq(struct_type.iend, code.len - 4);
 }
@@ -2193,11 +2193,11 @@ const Int32 A_FOO_BAR = 123;
     test::eq(struct_type.iend, code.len - 4);
 }
 
-fn void test_def_fn_pointer()
+fn void test_alias_fn_pointer()
 {
     String code = `module test::std::c3lang::ast;
-<*def doc*>
-def NodeParser = fn bool (Ast* ast, AstNode* node, Token* t, NodeParserState* state);
+<*alias doc*>
+alias NodeParser = fn bool (Ast* ast, AstNode* node, Token* t, NodeParserState* state);
 //`;  // NOTE: // - is sanity guard comment, don't delete it!
     DString contents = dstring::temp(code);
     Ast ast = ast::parse(contents.str_view(), "foo.c3", print_lex: true);
@@ -2211,11 +2211,11 @@ def NodeParser = fn bool (Ast* ast, AstNode* node, Token* t, NodeParserState* st
     AstTypeDefStructural* struct_type = (AstTypeDefStructural*)ast.@node_at(m.decls, 0);
     test::ne(struct_type, null);
 
-    test::eq(struct_type.type, TokenType.DEF);
+    test::eq(struct_type.type, TokenType.ALIAS);
     test::eq(struct_type.value, "NodeParser");
 
     test::eq(ast.@node_join(struct_type.attributes, contents), "");
-    test::eq(ast.@node_join(struct_type.docs, contents), "<*def doc");
+    test::eq(ast.@node_join(struct_type.docs, contents), "<*alias doc");
     test::eq(
         ast.@node_join(struct_type.ftype, contents),
         "fn,bool,(,Ast,*,ast,,,AstNode,*,node,,,Token,*,t,,,NodeParserState,*,state,)"
@@ -2225,7 +2225,7 @@ def NodeParser = fn bool (Ast* ast, AstNode* node, Token* t, NodeParserState* st
         "\n\n``%s``",
         code[struct_type.istart .. math::min((isz)struct_type.iend, (isz)(code.len - 1))]
     );
-    test::eq(struct_type.istart, 43);
+    test::eq(struct_type.istart, 45);
     test::eq(code[struct_type.iend], ';');
     test::eq(struct_type.iend, code.len - 4);
 }

@@ -226,9 +226,9 @@ macro print_nodes(format, ast_nodes, String sep = "")
 
 fn void print_decl_def(AstTypeDef* d, bool is_full_preview)
 {
-    assert(d.type == TokenType.DEF);
+    assert(d.type == TokenType.ALIAS);
 
-    io::printf("def %s = ", d.value);
+    io::printf("alias %s = ", d.value);
     print_nodes("%s", d.ftype, sep: " ");
     io::printfn(";");
 }
@@ -430,7 +430,7 @@ fn void? print_preview(
         if (d.decl == null) continue;
 
         switch (d.decl.type) {
-            case DEF:
+            case ALIAS:
                 print_decl_def((AstTypeDef*)d.decl, is_full_preview);
             case DISTINCT:
                 print_decl_distinct((AstTypeDef*)d.decl, is_full_preview);
@@ -488,11 +488,11 @@ fn int cmp_decl(ModuleDecl a, ModuleDecl b) @private
                     break;
             }
         case STRUCT:
-        case DEF:
+        case ALIAS:
         case DISTINCT:
             switch (b.decl.type) {
                 case STRUCT:
-                case DEF:
+                case ALIAS:
                 case DISTINCT:
                     is_comparable_type = true;
                 default:
