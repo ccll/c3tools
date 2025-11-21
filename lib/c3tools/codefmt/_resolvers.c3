@@ -399,7 +399,7 @@ fn bool CodeFmt._resolve_default_space(&self, NodeParserState* state, Token* t) 
         case NEXTCASE:
         case INLINE:
         case TYPEID:
-        case DISTINCT:
+        case TYPEDEF:
         case BREAK:
         case CONTINUE:
         case RVEC:
@@ -411,7 +411,7 @@ fn bool CodeFmt._resolve_default_space(&self, NodeParserState* state, Token* t) 
         case FOR:
         case FOREACH:
         case DEFER:
-        case DEF:
+        case ALIAS:
         case CONST:
         case TLOCAL:
         case STATIC:
