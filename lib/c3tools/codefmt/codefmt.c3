@@ -25,7 +25,7 @@ struct CodeFmt
     bool _skip_next_new_line;
 
     // Track if the last stack is for generics type list
-    bool _is_generic_list;
+    bool is_prev_scope_generic;
 }
 
 <*
