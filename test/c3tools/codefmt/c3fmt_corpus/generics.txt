@@ -1,5 +1,5 @@
 ================================================================================
-struct_generic_field
+generic_in_struct_scope
 ================================================================================
 struct FileWatch {
     Atomic { bool}is_running ;
@@ -10,7 +10,7 @@ struct FileWatch
     Atomic{bool} is_running;
 }
 ================================================================================
-struct_generic_nested
+nested_generic_in_struct_scope
 ================================================================================
 struct FileWatch {
     List{Atomic { bool} }    is_running
@@ -22,7 +22,7 @@ struct FileWatch
     List{Atomic{bool}} is_running;
 }
 ================================================================================
-struct_generic_nested_multi
+nested_multi_generic_type_in_struct_scope
 ================================================================================
 struct FileWatch {
     List{Atomic { bool}, Foo {int } }    whatever
@@ -34,10 +34,57 @@ struct FileWatch
     List{Atomic{bool}, Foo{int}} whatever;
 }
 ================================================================================
-alias_with_generic
+generic_in_alias
 ================================================================================
 alias TFoo = fn List{int}  ? foo();
 alias TFoo = fn List{int}  ? foo();
 --------------------------------------------------------------------------------
 alias TFoo = fn List{int}? foo();
 alias TFoo = fn List{int}? foo();
+================================================================================
+generic_fn_return
+================================================================================
+fn List{int}  ? foo() {
+    return (List{int}){1, 2, 3};
+}
+--------------------------------------------------------------------------------
+fn List{int}? foo()
+{
+    return (List{int}) { 1, 2, 3 };
+}
+================================================================================
+generic_fn_call
+================================================================================
+fn List{int}  ? foo()
+{
+    return bar{int}((List{int}){1, 2, 3});
+}
+--------------------------------------------------------------------------------
+fn List{int}? foo()
+{
+    return bar{int}((List{int}) {1, 2, 3});
+}
+================================================================================
+generic_fn_params
+================================================================================
+fn List{int  }  ? foo(Foo { bool}   foo, Bar{int }   bar  )
+{
+    return   bar{int}((List{int}){1, 2, 3})  ;
+}
+--------------------------------------------------------------------------------
+fn List{int}? foo(Foo{bool} foo, Bar{int} bar)
+{
+    return bar{int}((List{int}) {1, 2, 3});
+}
+================================================================================
+nested_generic_fn
+================================================================================
+fn List{Foo {bool, int }  }  ? foo(MyGenericType { Foo{bool, int }, Bar{string }  }   value )
+{
+    return   bar{int}((List{int}){1, 2, 3})  ;
+}
+--------------------------------------------------------------------------------
+fn List{Foo{bool,int}}? foo(MyGenericType{Foo{bool, int}, Bar{string}} value)
+{
+    return bar{int}((List{int}) {1, 2, 3});
+}
