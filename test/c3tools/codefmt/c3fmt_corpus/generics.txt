@@ -33,3 +33,11 @@ struct FileWatch
 {
     List{Atomic{bool}, Foo{int}} whatever;
 }
+================================================================================
+alias_with_generic
+================================================================================
+alias TFoo = fn List{int}  ? foo();
+alias TFoo = fn List{int}  ? foo();
+--------------------------------------------------------------------------------
+alias TFoo = fn List{int}? foo();
+alias TFoo = fn List{int}? foo();

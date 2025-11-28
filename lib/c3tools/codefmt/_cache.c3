@@ -107,7 +107,7 @@ macro void? CodeFmt.cache_statement_dump(
             if (self._print_lex) io::eprintf("%s ", t.type);
             switch (t.type) {
                 case QUESTION:
-                    if (self._resolve__question_prespace(i)) self.write(" ");
+                    if (!self.is_prev_scope_generic && self._resolve__question_prespace(i)) self.write(" ");
                     nextcase default;
                 case LBRACE:
                     brace_is_generic.push(self._resolve__prev_token(i, 1) == TYPE_IDENT);

@@ -569,10 +569,16 @@ fn bool? CodeFmt.format_generic_statement(CodeFmt* self, Token* t, NodeParserSta
                             return self.push_run_state(&CodeFmt.format_code_scope, t);
                         case FN:
                             // distinguish `foo(List{int} x) {...}` and `foo() { ... }`
-                            if (state.last_token == TYPE_IDENT) nextcase default;
+                            if (state.last_token == TYPE_IDENT) {
+                                self.cache_statement_dump()!;
+                                return self.push_run_state(&CodeFmt.format_generic_type_scope, t);
+                            }
                             self.trace("fn foo() { inline enter");
                             self.cache_statement_dump()!;
-                            self.write(" ");
+                            if (!self.is_prev_scope_generic) {
+                                self.write(" ");
+                            }
+                            self.is_prev_scope_generic = false;
                             return self.push_run_state(&CodeFmt.format_code_scope, t);
                         case FOR:
                         case DO:
@@ -615,10 +621,6 @@ fn bool? CodeFmt.format_generic_statement(CodeFmt* self, Token* t, NodeParserSta
                             if (state.scope_depth != 0) nextcase default;
                             self.trace("@body macro scope inline exit");
                         case FN:
-                            // TODO: use new format_generic_type_list()
-                            // if (state.last != state.scope_depth) { break; }
-                            // else { nextcase default; }
-                            break;
                         case DO:
                             self.trace("fn/do scope inline exit");
                             break;
@@ -1400,24 +1402,28 @@ fn bool? CodeFmt.format_structural_scope(CodeFmt* self, Token* t, NodeParserStat
             self.trace("SCOPE");
             switch (t.type) {
                 case LBRACE:
-                    if (state.scope_depth > 1 && state.last_token == TYPE_IDENT) {
-                        // is generic type list
-                        self._is_generic_list = true;
+                    if (state.last_token == TYPE_IDENT) {
+                        // Inside a struct scope, TYPE_IDENT followed by LBRACE starts a generic type list scope.
                         self.cache_statement_dump()!;
-                        return self.push_run_state(&CodeFmt.format_generic_type_list, t);
+                        return self.push_run_state(&CodeFmt.format_generic_type_scope, t);
                     } else {
-                        self._is_generic_list = false;
+                        if (self.cache_statement_len() == 0) {
+                            self.newline();
+                        }
+                        self.cache_statement_add(state, t);
                     }
                 case RBRACE:
+                    if (self.is_prev_scope_generic) {
+                        // Is end of generic type list, rather than end of struct scope.
+                        self.write(" ");
+                        break;
+                    }
+                    self.dedent()!;
+                    self.newline();
+                    self.write("}");
                     if (state.scope_depth == 0) {
-                        self.dedent()!;
-                        self.newline();
-                        self.write("}");
                         self.trace("EXIT");
                         return true;
-                    } else if (state.scope_depth == 1) {
-                        // Add a space after the 1st level RBRACES, for generic type list
-                        self.write(" ");
                     }
                 case EOS:
                     self.cache_statement_add(state, t);
@@ -1435,11 +1441,10 @@ fn bool? CodeFmt.format_structural_scope(CodeFmt* self, Token* t, NodeParserStat
                 case DOCS_END:
                     break;
                 default:
-                    // self.write(" %s ", self._is_generic_list);
-                    self.write("");
-                    if (self.cache_statement_len() == 0 && !self._is_generic_list  ) {
-                        self.newline(is_empty: true);
+                    if (self.cache_statement_len() == 0 && !self.is_prev_scope_generic) {
+                        self.newline();
                     }
+                    self.is_prev_scope_generic = false;
                     self.cache_statement_add(state, t);
             }
         default:
@@ -1451,7 +1456,7 @@ fn bool? CodeFmt.format_structural_scope(CodeFmt* self, Token* t, NodeParserStat
 <*
  Formatter for generic type list
 *>
-fn bool? CodeFmt.format_generic_type_list(CodeFmt* self, Token* t, NodeParserState* state) @private
+fn bool? CodeFmt.format_generic_type_scope(CodeFmt* self, Token* t, NodeParserState* state) @private
 {
     assert(t.type != EMPTY_LINE);
 
@@ -1468,13 +1473,14 @@ fn bool? CodeFmt.format_generic_type_list(CodeFmt* self, Token* t, NodeParserSta
                     // Nested generic type list
                     if (state.last_token == TYPE_IDENT) {
                         self.cache_statement_dump()!;
-                        return self.push_run_state(&CodeFmt.format_generic_type_list, t);
+                        return self.push_run_state(&CodeFmt.format_generic_type_scope, t);
                     }
                 case RBRACE:
                     if (state.scope_depth == 0) {
                         self.trace("EXIT");
                         self.cache_statement_dump()!;
                         self.write("}");
+                        self.is_prev_scope_generic = true;
                         return true;
                     }
                 default:
