@@ -1520,13 +1520,13 @@ fn bool? CodeFmt.format_faultdef(CodeFmt* self, Token* t, NodeParserState* state
                     self.write("%s", t.value);
                 case EOS:
                     self.write(";");
+                    self.dedent()!;
                     state.transition(EOF);
                 default:
                     break;
             }
         case EOF:
             self.trace("EXIT");
-            self.dedent()!;
             return true;
         default:
             unreachable();
