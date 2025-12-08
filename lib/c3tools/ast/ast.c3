@@ -27,6 +27,9 @@ struct NodeParserState
     AstNode* sub_node;
     uint scope_depth;
     TokenType[32] scope_stack;
+
+    // HACK: for macro flow control, $if, $for, $foreach, $swithc, etc.
+    int colons;
 }
 
 struct AstNode

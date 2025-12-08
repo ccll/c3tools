@@ -1143,11 +1143,17 @@ fn bool? CodeFmt.format_comptime_code_flow(CodeFmt* self, Token* t, NodeParserSt
             self.trace("ENTRY");
             self.newline();
             switch (t.type) {
-                case CT_FOR:  // $for
                 case CT_FOREACH:  // $foreach
+                    state.colons = 2;
+                    state.scope_depth++;
+                    self.write("%s", t.value);
+                case CT_FOR:  // $for
                 case CT_IF:  // $if
+                    state.colons = 1;
+                    state.scope_depth++;
                     self.write("%s ", t.value);
                 case CT_SWITCH:  // $switch
+                    state.scope_depth++;
                     self.write("%s", t.value);
                 default:
                     unreachable();
@@ -1160,24 +1166,20 @@ fn bool? CodeFmt.format_comptime_code_flow(CodeFmt* self, Token* t, NodeParserSt
                 case CT_CASE:
                 case CT_DEFAULT:
                     self.indent();
-                    self.indent();
+                    // self.indent();
+                    if (state.initial_token == CT_SWITCH) {
+                        TokenType wrap_rule = self.cache_statement_wrap_rule(state.initial_token);
+                        self.cache_statement_dump(wrap_rule)!;
+                        // self.write("%s", t.value);
+                        // self.indent();
+                        state.transition(SCOPE);
+                        if (state.initial_token == CT_SWITCH) self.indent();
+                    }
                     nextcase STATE: state.transition(SCOPE);
                 case COLON:
-                    if (state.scope_depth == 0 && state.initial_token == CT_IF) {
-                        self.cache_statement_dump(wrap_rule: BOOL)!;
-                        self.write("%s", t.value);
-                        self.indent();
-                        state.transition(SCOPE);
-                    } else {
-                        nextcase default;
-                    }
-                case LPAREN:
-                    if (state.scope_depth == 1 && state.initial_token == CT_SWITCH) {
-                        self.write(" ");
-                    }
-                    nextcase default;
-                case RPAREN:
-                    if (state.scope_depth == 0 && state.initial_token != CT_IF) {
+                    state.colons--;
+                    if (state.colons <= 0) {
+                        state.scope_depth--;    // Ending colon reduces scope depth
                         TokenType wrap_rule = self.cache_statement_wrap_rule(state.initial_token);
                         self.cache_statement_dump(wrap_rule)!;
                         self.write("%s", t.value);
@@ -1185,9 +1187,13 @@ fn bool? CodeFmt.format_comptime_code_flow(CodeFmt* self, Token* t, NodeParserSt
                         state.transition(SCOPE);
                         if (state.initial_token == CT_SWITCH) self.indent();
                     } else {
-                        self.cache_statement_add(state, t);
+                        self.write(" ");
+                        nextcase default;
                     }
                 default:
+                    if (state.last_token == CT_SWITCH) {
+                        self.write(" ");
+                    }
                     self.cache_statement_add(state, t);
             }
         case SCOPE:

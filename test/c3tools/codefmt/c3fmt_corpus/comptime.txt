@@ -52,7 +52,7 @@ ct_for_in_ct_scope
 macro foo($a)
 {
     $if $x > 3:
-    $for (var $x = 0; $x < $a; $x++)
+    $for var $x = 0; $x < $a; $x++:
 io::printfn("%d", $x);
     $endfor
     $endif
@@ -62,7 +62,7 @@ io::printfn("%d", $x);
 macro foo($a)
 {
     $if $x > 3:
-        $for (var $x = 0; $x < $a; $x++)
+        $for var $x = 0; $x < $a; $x++:
             io::printfn("%d", $x);
         $endfor
     $endif
@@ -73,7 +73,7 @@ ct_foreach
 macro foo_enum($SomeEnum)
 {
     $if $x > 3:
-    $foreach ($x : $SomeEnum.values)
+    $foreach $x : $SomeEnum.values:
     io::printfn("%d", (int)$x);
     $endforeach
     $endif
@@ -83,7 +83,7 @@ macro foo_enum($SomeEnum)
 macro foo_enum($SomeEnum)
 {
     $if $x > 3:
-        $foreach ($x : $SomeEnum.values)
+        $foreach $x : $SomeEnum.values:
             io::printfn("%d", (int)$x);
         $endforeach
     $endif
@@ -94,7 +94,7 @@ ct_switch
 macro @foo($x, #y)
 {
     $if $x > 3:
-    $switch ($x)
+    $switch  $x :
         $case 0:
         $case 1:
             #y += $x * $x;
@@ -115,7 +115,7 @@ macro @foo($x, #y)
 macro @foo($x, #y)
 {
     $if $x > 3:
-        $switch ($x)
+        $switch $x:
             $case 0:
             $case 1:
                 #y += $x * $x;
@@ -183,14 +183,14 @@ ct_if_call_colon_position
 ================================================================================
 macro @foo($x, #y)
 {
-    $if type_is_overaligned(foo,bar: soo):
+    $if type_is_overaligned():
     #y += $x * $x;
     $endif
 }
 --------------------------------------------------------------------------------
 macro @foo($x, #y)
 {
-    $if type_is_overaligned(foo, bar: soo):
+    $if type_is_overaligned():
         #y += $x * $x;
     $endif
 }
@@ -200,8 +200,8 @@ ct_foreach_in_other
 macro foo_enum($SomeEnum)
 {
     $if $x > 3:
-    $foreach ($x : $SomeEnum.values)
-    $foreach ($x : $SomeEnum.values)
+    $foreach $x : $SomeEnum.values:
+    $foreach $x : $SomeEnum.values:
     io::printfn("%d", (int)$x);
     $endforeach
     $endforeach
@@ -212,8 +212,8 @@ macro foo_enum($SomeEnum)
 macro foo_enum($SomeEnum)
 {
     $if $x > 3:
-        $foreach ($x : $SomeEnum.values)
-            $foreach ($x : $SomeEnum.values)
+        $foreach $x : $SomeEnum.values:
+            $foreach $x : $SomeEnum.values:
                 io::printfn("%d", (int)$x);
             $endforeach
         $endforeach
@@ -224,16 +224,16 @@ ct_switch_in_other
 ================================================================================
 macro @foo($x, #y)
 {
-    $switch ($x)
+    $switch $x:
         $case 1:
-            $switch ($x)
+            $switch $x:
                 $case 1:
                 $default:
                     #y -= $x;
             $endswitch
         $default:
             #y -= $x;
-            $switch ($x)
+            $switch $x:
                 $case 2:
                 $default:
                     #y -= $x;
@@ -243,16 +243,16 @@ macro @foo($x, #y)
 --------------------------------------------------------------------------------
 macro @foo($x, #y)
 {
-    $switch ($x)
+    $switch $x:
         $case 1:
-            $switch ($x)
+            $switch $x:
                 $case 1:
                 $default:
                     #y -= $x;
             $endswitch
         $default:
             #y -= $x;
-            $switch ($x)
+            $switch $x:
                 $case 2:
                 $default:
                     #y -= $x;
