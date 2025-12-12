@@ -248,11 +248,11 @@ fn bool? CodeFmt.format_fn(CodeFmt* self, Token* t, NodeParserState* state) @pri
             switch (t.type) {
                 case AT_IDENT:
                 case IDENT:
-                    if (state.scope_depth == 0 && state.last_token != DOT) self.write(" ");
+                    if (state.scope_depth == 0 && state.last_token != DOT && state.last_token != SCOPE) self.write(" ");
                     nextcase default;
                 case TYPE_IDENT:
                 case TYPEID:
-                    if (state.scope_depth == 0) self.write(" ");
+                    if (state.scope_depth == 0 && state.last_token != SCOPE) self.write(" ");
                     nextcase default;
                 case LPAREN:
                     nextcase STATE: state.transition(VAR);
