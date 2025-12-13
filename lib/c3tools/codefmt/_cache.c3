@@ -408,6 +408,7 @@ macro bool CodeFmt.cache_split_multiline(&self, NodeParserState* state, TokenTyp
                 case AND:
                 case CT_OR:
                 case CT_AND:
+                case BIT_OR:
                     return true;
                 default:
                     return false;
