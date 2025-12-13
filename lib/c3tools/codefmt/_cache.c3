@@ -286,6 +286,22 @@ macro void? CodeFmt.cache_statement_dump_generic(&self, bool is_multiline, Token
                 case QUESTION:
                     if (self._resolve__question_prespace(i)) self.write(" ");
                     nextcase default;
+                case SPACE:
+                    // Postpone writing of spaces until we know there is no newline.
+                    bool postpone_space = false;
+                    if (is_multiline) {
+                        switch (self._resolve__next_token(i)) {
+                            case OR:
+                            case AND:
+                            case CT_OR:
+                            case CT_AND:
+                            case BIT_OR:
+                                postpone_space = true;
+                            default:
+                                break;
+                        }
+                    }
+                    if (!postpone_space) nextcase TOP: default;
                 default:
                     if (is_multiline) {
                         if (self.cache_split_multiline(&tmpstate, wrap_rule)) {
@@ -300,6 +316,8 @@ macro void? CodeFmt.cache_statement_dump_generic(&self, bool is_multiline, Token
                                 tmpstate.current_token = tmpstate.last_token;
                                 if (self._resolve__next_token(i) == RBRACE) break;
                             }
+                            // Output the space since it's not a newline.
+                            if (tmpstate.last_token == SPACE) self.write(" ");
                             self.write("%s", t.value);
                         }
                     } else {
@@ -336,6 +354,8 @@ macro void? CodeFmt.cache_statement_dump_generic(&self, bool is_multiline, Token
                                     tmpstate.current_token = tmpstate.last_token;
                                     if (self._resolve__next_token(i) == RBRACE) break;
                                 }
+                                // Output the space since it's not a newline.
+                                if (tmpstate.last_token == SPACE) self.write(" ");
                                 self.write("%s", t.value);
                         }
 
@@ -400,15 +420,24 @@ macro bool CodeFmt.cache_split_multiline(&self, NodeParserState* state, TokenTyp
         }
     } else if (state.scope_depth != 1) return false;
 
+    // Break before certain tokens.
+    if (wrap_rule == INVALID_TOKEN) {
+        switch (state.current_token) {
+            case OR:
+            case AND:
+            case CT_OR:
+            case CT_AND:
+            case BIT_OR:
+                return true;
+            default:
+                break;
+        }
+    }
+
     switch (wrap_rule) {
         case INVALID_TOKEN:
             switch (state.last_token) {
                 case COMMA:
-                case OR:
-                case AND:
-                case CT_OR:
-                case CT_AND:
-                case BIT_OR:
                     return true;
                 default:
                     return false;

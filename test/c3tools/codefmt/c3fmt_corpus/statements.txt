@@ -122,10 +122,10 @@ fn void main()
 fn void main()
 {
     return (
-        foo_log_long ||
-        bar &&
-        io::printf("soo", a, sooo::foo::bar("adskjalsda", looooong, var1), another_var1) ||
-        bar
+        foo_log_long
+        || bar
+        && io::printf("soo", a, sooo::foo::bar("adskjalsda", looooong, var1), another_var1)
+        || bar
     );
 }
 ================================================================================
@@ -1143,9 +1143,9 @@ fn void main()
         case test() == 1:
             baz();
         case (
-            foo_too_long(a, tb, sz) > 0 &&
-            another_too_loong(maybe) &&
-            just_one_more_condition > 0
+            foo_too_long(a, tb, sz) > 0
+            && another_too_loong(maybe)
+            && just_one_more_condition > 0
         ):
             bar();
     }
