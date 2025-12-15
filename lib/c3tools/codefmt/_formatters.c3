@@ -246,10 +246,12 @@ fn bool? CodeFmt.format_fn(CodeFmt* self, Token* t, NodeParserState* state) @pri
         case RETURN:  // return type
             self.trace("RETURN");
             switch (t.type) {
+                case CT_IDENT:
                 case AT_IDENT:
                 case IDENT:
                     if (state.scope_depth == 0 && state.last_token != DOT && state.last_token != SCOPE) self.write(" ");
                     nextcase default;
+                case CT_TYPE_IDENT:
                 case TYPE_IDENT:
                 case TYPEID:
                     if (state.scope_depth == 0 && state.last_token != SCOPE) self.write(" ");
