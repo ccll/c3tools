@@ -79,7 +79,12 @@ fn int main(String[] args)
 }
 
 fn void? format_file(
-    String file_name, int max_line_width, bool force_mode, bool dry_mode, bool debug_mode, String indent_type
+    String file_name,
+    int max_line_width,
+    bool force_mode,
+    bool dry_mode,
+    bool debug_mode,
+    String indent_type
 )
 {
     path::Path p = path::temp(file_name)!;
@@ -101,7 +106,9 @@ fn void? format_file(
         return io::GENERAL_ERROR?;
     }
 
-    io::printfn("Path: %s", p.str_view());
+    if (debug_mode) {
+        io::printfn("Path: %s", p.str_view());
+    }
 
     String contents = (String)file::load(mem, p.str_view())!;
     defer contents.free(mem);
