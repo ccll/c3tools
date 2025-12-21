@@ -7,8 +7,10 @@ fn int main(String[] args)
 {
     bool force_mode = false;
     bool dry_mode = false;
+    bool debug_mode = false;
     int max_line_width = 100;
     String indent_type = "4";
+
     argparse::ArgParse agp = {
         .description = "c3 code formatting tool",
         .usage = "[options] [-] file1 .. fileN",
@@ -26,6 +28,12 @@ fn int main(String[] args)
                 .long_name = "dry",
                 .value = &dry_mode,
                 .help = "dry mode (only print)"
+            },
+            {
+                .short_name = 'd',
+                .long_name = "debug",
+                .value = &debug_mode,
+                .help = "debug mode (print filepaths)"
             },
             argparse::group_opt("Code format options"),
             {
@@ -60,7 +68,7 @@ fn int main(String[] args)
             }
             break;
         } else if (
-            catch err = format_file(file_name, max_line_width, force_mode, dry_mode, indent_type)
+            catch err = format_file(file_name, max_line_width, force_mode, dry_mode, debug_mode, indent_type)
         ) {
             return 1;
         }
@@ -71,7 +79,7 @@ fn int main(String[] args)
 }
 
 fn void? format_file(
-    String file_name, int max_line_width, bool force_mode, bool dry_mode, String indent_type
+    String file_name, int max_line_width, bool force_mode, bool dry_mode, bool debug_mode, String indent_type
 )
 {
     path::Path p = path::temp(file_name)!;
@@ -85,7 +93,7 @@ fn void? format_file(
         return io::FILE_IS_DIR?;
     }
     if (!force_mode && !p.has_extension("c3")) {
-        io::printfn("Expected only .c3 expension (or use --force flag) %s", file_name);
+        io::printfn("Expected only .c3 extension (or use --force flag) %s", file_name);
         return io::GENERAL_ERROR?;
     }
     if (indent_type.len != 1) {
